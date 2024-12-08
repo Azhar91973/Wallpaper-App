@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Dynamic Wallpaper</string>
+    <string name="Home">Home</string>
+    <string name="search">Search</string>
+    <string name="category">Category</string>
+    <string name="favourites">Favourites</string>
+    <string name="setting">Setting</string>
+    <string name="find_wallpaper">Find Wallpaper..</string>
+    <string name="view_all">View All</string>
+    <string name="img">Img</string>
+    <string name="share">Share</string>
+    <string name="set">SET</string>
+    <string name="favorite">Favourite</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>
