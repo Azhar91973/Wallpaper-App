@@ -11,8 +11,8 @@ interface WallpaperApi {
     @GET("v1/{type} ")
     suspend fun getWallpaper(
         @Path("type") type:String,
-        @Query("query") query: String?=null,
+        @Query("query") query: String?,
         @Query("page") page:Int,
-        @Query("per_page") perPage: Int = 75
-    ): Response<WallpaperItems>
+        @Query("per_page") perPage: Int = 80
+    ): WallpaperItems
 }

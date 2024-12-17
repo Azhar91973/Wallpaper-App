@@ -11,14 +11,33 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_viewWallpaperFragment"
-            app:destination="@id/viewWallpaperFragment" />
+            android:id="@+id/action_HomeFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:enterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+
+        <action
+            android:id="@+id/action_HomeFragment_to_viewWallpaperFragment"
+            app:destination="@id/viewWallpaperFragment"
+            app:enterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+
+
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.dynamicwallpaper.Fragments.SearchFragment"
-        android:label="fragment_category"
-        tools:layout="@layout/fragment_search" />
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_viewWallpaperFragment"
+            app:destination="@id/viewWallpaperFragment"
+            app:enterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <argument
+            android:name="query"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/favouriteFragment"
         android:name="com.example.dynamicwallpaper.Fragments.FavouriteFragment"
@@ -35,7 +54,19 @@
         android:label="fragment_view_wallpapper"
         tools:layout="@layout/fragment_view_wallpapper">
         <argument
-            android:name="cachedWallpapers"
+            android:name="source"
+            android:defaultValue="home"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="com.example.dynamicwallpaper.Fragments.CategoryFragment"
+        android:label="fragment_category"
+        tools:layout="@layout/fragment_category">
+        <action
+            android:id="@+id/action_categoryFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:enterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 </navigation>

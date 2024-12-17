@@ -1,41 +1,36 @@
 package com.example.dynamicwallpaper.Fragments
 
 import android.app.WallpaperManager
-import android.content.ContentValues.TAG
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.dynamicwallpaper.Common.BaseAdapter
 import com.example.dynamicwallpaper.Common.BaseFragment
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
-import com.example.dynamicwallpaper.Models.Photo
+import com.example.dynamicwallpaper.MainActivity
+import com.example.dynamicwallpaper.Paging.ViewWallpaperPagingAdapter
 import com.example.dynamicwallpaper.WallpaperViewModel
 import com.example.dynamicwallpaper.databinding.FragmentViewWallpapperBinding
-import com.example.dynamicwallpaper.databinding.SetWallpaperItemBinding
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
 
-    private var cachedWallpaper = mutableListOf<Photo>()
-    private lateinit var adapter: BaseAdapter<Photo>
+    private lateinit var pagingAdapter: ViewWallpaperPagingAdapter
     private lateinit var wallpaperViewModel: WallpaperViewModel
-    private var position: Int? = null
-    private var page: Int? = 1
     private lateinit var wallpaperManager: WallpaperManager
+    lateinit var source: String
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentViewWallpapperBinding {
@@ -44,14 +39,12 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Enable edge-to-edge for this fragment
+        requireActivity().window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 
-        val wallpaperGson = arguments?.getString("cachedWallpaper")
-        position = arguments?.getInt("position")
-        page = arguments?.getInt("page")
-        if (wallpaperGson != null) {
-            cachedWallpaper =
-                Gson().fromJson(wallpaperGson, Array<Photo>::class.java).toMutableList()
-        }
+        (requireActivity() as MainActivity).setBottomNavigationVisibility(false)
+        source = arguments?.getString("source") ?: "home"
         wallpaperViewModel = ViewModelProvider(requireActivity())[WallpaperViewModel::class.java]
         setUpViews()
         setUpClickListeners()
@@ -61,52 +54,27 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
     override fun setUpViews() {
         wallpaperManager = WallpaperManager.getInstance(context)
         // Initialize adapter
-        adapter = BaseAdapter()
-        adapter.listOfItems = cachedWallpaper
-        adapter.expressionOnCreateViewHolder = {
-            SetWallpaperItemBinding.inflate(layoutInflater, it, false)
+        pagingAdapter =
+            ViewWallpaperPagingAdapter(::setWallpaper, ::favImage, ::shareImage, ::backBtnClicked)
+        with(binding) {
+            vpViewWallpaper.adapter = pagingAdapter
+            vpViewWallpaper.adapter = pagingAdapter
         }
-        adapter.expressionViewHolderBinding = { item, viewBinding ->
-            val view = viewBinding as SetWallpaperItemBinding
+    }
 
-            // Load the wallpaper using Glide
-            Glide.with(requireContext()).load(item.src.portrait).into(view.viewWallpaper)
+    private fun favImage(imageUrl: String) {
+        wallpaperViewModel.insertFavImage(FavouriteImageDataBase(imageUrl))
+        showSnackBar("Image Added to Favourite")
+    }
 
-            // Set wallpaper on button click
-            view.imgSetWallpaper.setOnClickListener {
-                setWallpaper(item.src.portrait)
-            }
-            view.imgAddFavourite.setOnClickListener {
-                wallpaperViewModel.insertFavImage(FavouriteImageDataBase(item.src.portrait))
-                showSnackBar("Added to Favourite")
-            }
-        }
-
-        // Set adapter to ViewPager2
-        binding.vpViewWallpaper.adapter = adapter
-        position?.let { binding.vpViewWallpaper.setCurrentItem(it, false) }
-
-        // Page change listener for pagination
-        binding.vpViewWallpaper.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                // Load next page when reaching the end of the current page
-                if (position == adapter.itemCount - 1) {
-                    showSnackBar("Loading more wallpapers...")
-                    page = page!! + 1
-                    wallpaperViewModel.getWallpapers(page!!, null, "curated")
-                }
-            }
-        })
+    private fun shareImage(imageUrl: String) {
+        // TODO Implement Share Function
     }
 
     private fun setWallpaper(imageUrl: String) {
-        // Use Glide to download the image and set it as wallpaper
         lifecycleScope.launch {
             Glide.with(requireContext()).asBitmap().load(imageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)  // Ensure caching
-                .into(object : CustomTarget<Bitmap>() {
+                .diskCacheStrategy(DiskCacheStrategy.ALL).into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(
                         resource: Bitmap, transition: Transition<in Bitmap>?
                     ) {
@@ -121,22 +89,45 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
         }
     }
 
+    private fun backBtnClicked() {
+        findNavController().navigateUp()
+    }
+
     override fun setUpClickListeners() {}
     override fun setUpObservers() {
-        wallpaperViewModel.wallpapers.observe(viewLifecycleOwner) { wallpapers ->
-            if (wallpapers != null) {
-                val updatedWallpapers = ArrayList(cachedWallpaper) // Create a copy
-                updatedWallpapers.addAll(wallpapers.photos) // Add new items
-                adapter.updateItems(updatedWallpapers) // Update adapter items
-                cachedWallpaper = updatedWallpapers // Update the reference
-                Log.d(TAG, "Updated adapter.listOfItems: ${adapter.listOfItems.size}")
-                Log.d(TAG, "Updated cachedWallpaper: ${cachedWallpaper.size}")
+        pagingAdapter.refresh() // Clear any previous data
+
+        if (source == "search") {
+            wallpaperViewModel.searchedWallpapers.observe(viewLifecycleOwner) { pagingData ->
+                pagingAdapter.submitData(lifecycle, pagingData)
             }
-            Log.d(TAG, "Page : $page")
-        }
-        wallpaperViewModel.error.observe(viewLifecycleOwner) {
-            showSnackBar(it)
+        } else {
+            wallpaperViewModel.wallpapers.observe(viewLifecycleOwner) { pagingData ->
+                pagingAdapter.submitData(lifecycle, pagingData)
+            }
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Saving the state/position of recyclerView
+        wallpaperViewModel.selectedPosition = binding.vpViewWallpaper.currentItem
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // setting the state/position of recyclerView
+        wallpaperViewModel.selectedPosition.let {
+            binding.vpViewWallpaper.setCurrentItem(wallpaperViewModel.selectedPosition!!, false)
+        }
+        (requireActivity() as MainActivity).setBottomNavigationVisibility(false)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        if (source != "search") (requireActivity() as MainActivity).setBottomNavigationVisibility(
+            true
+        )
+    }
 }

@@ -6,6 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.SearchFragment">
 
+    <ImageView
+        android:id="@+id/img_back_btn"
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/btn_bg"
+        android:contentDescription="@string/img"
+        android:src="@drawable/ic_back_btn_white"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_category_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible"
+        android:fontFamily="@font/poppins_bold"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/img_back_btn"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <SearchView
         android:id="@+id/search_view"
         android:layout_width="0dp"
@@ -13,12 +39,14 @@
         android:layout_marginHorizontal="15dp"
         android:layout_marginTop="15dp"
         android:background="@drawable/search_bg"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:iconifiedByDefault="false"
         android:queryBackground="@android:color/transparent"
         android:queryHint="@string/find_wallpaper"
         android:searchIcon="@drawable/ic_search"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/img_back_btn"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -32,6 +60,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_view"
+        app:layout_constraintVertical_bias="0.0"
         app:spanCount="3" />
+
+    <ProgressBar
+        android:id="@+id/pb"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rv_searchWallpapers" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

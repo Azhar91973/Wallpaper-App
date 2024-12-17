@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.FavouriteFragment">
+    tools:context=".Fragments.CategoryFragment">
 
     <ImageView
         android:id="@+id/img_back_btn"
@@ -18,12 +18,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_favourite"
+        android:id="@+id/tv_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_bold"
-        android:text="@string/favorite"
+        android:text="@string/category"
         android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_fav_wallpapers"
+        android:id="@+id/rv_category_items"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="20dp"
@@ -40,7 +40,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_favourite"
-        app:layout_constraintVertical_bias="0.0"
-        app:spanCount="3" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_category"
+        app:layout_constraintVertical_bias="0.491"
+        app:spanCount="3"
+        tools:listitem="@layout/category_item" />
 </androidx.constraintlayout.widget.ConstraintLayout>

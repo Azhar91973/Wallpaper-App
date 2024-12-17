@@ -8,7 +8,7 @@
         android:id="@+id/img_wallpaper"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_margin="5dp"
+        android:layout_margin="3dp"
         android:scaleType="matrix"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

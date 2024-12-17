@@ -35,7 +35,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
     fun showSnackBar(message: String) {
         hideKeyboard(requireView())
-        binding?.let { Snackbar.make(it.root, message, Snackbar.LENGTH_SHORT).show() }
+        binding.let { Snackbar.make(it.root, message, Snackbar.LENGTH_SHORT).show() }
     }
 
     private fun hideKeyboard(view: View) {

@@ -1,35 +1,28 @@
 package com.example.dynamicwallpaper.Fragments
 
-import android.content.ContentValues
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
-import com.example.dynamicwallpaper.Common.BaseAdapter
 import com.example.dynamicwallpaper.Common.BaseFragment
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
+import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Models.Photo
-import com.example.dynamicwallpaper.ViewWallpaperActivity
+import com.example.dynamicwallpaper.Paging.WallpaperPagingAdapter
+import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.WallpaperViewModel
 import com.example.dynamicwallpaper.databinding.FragmentSearchBinding
-import com.example.dynamicwallpaper.databinding.WallpaperItemBinding
-import com.google.gson.Gson
 
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
-    private lateinit var rvLayoutManager: GridLayoutManager
-    private lateinit var adapter: BaseAdapter<Photo>
-    private var page = 1
+    private lateinit var pagingAdapter: WallpaperPagingAdapter
     private lateinit var viewModel: WallpaperViewModel
-    private lateinit var startForResult: ActivityResultLauncher<Intent>
-    private var cachedWallpaper = mutableListOf<Photo>()
+    private var query: String? = null
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentSearchBinding {
@@ -39,58 +32,43 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[WallpaperViewModel::class.java]
-        startForResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+        query = arguments?.getString("query")
         setUpViews()
         setUpClickListeners()
         setUpObservers()
     }
 
     override fun setUpViews() {
-        adapter = BaseAdapter()
-        rvLayoutManager = GridLayoutManager(requireContext(), 3)
-
-    }
-
-    private fun setUpWallpapers(wallpapers: List<Photo>) {
-
-        adapter.listOfItems = wallpapers.toMutableList()
-        adapter.expressionOnCreateViewHolder = {
-            WallpaperItemBinding.inflate(layoutInflater, it, false)
-        }
-        adapter.expressionViewHolderBinding = { item, viewBinding ->
-            val view = viewBinding as WallpaperItemBinding
-            Glide.with(requireContext()).load(item.src.portrait).into(view.imgWallpaper)
-            view.imgWallpaper.setOnClickListener {
-                startActivityWithDestination(
-                    "ViewWallpaperFragment", cachedWallpaper, cachedWallpaper.indexOf(item), page
-                )
-            }
-            view.icFav.setOnClickListener {
-                viewModel.insertFavImage(FavouriteImageDataBase(item.src.portrait))
-                showSnackBar("Added to favourites")
+        pagingAdapter = WallpaperPagingAdapter(::onItemClicked, ::onFavClick)
+        with(binding) {
+            rvSearchWallpapers.layoutManager = GridLayoutManager(requireContext(), 2)
+            rvSearchWallpapers.setHasFixedSize(true)
+            rvSearchWallpapers.adapter = pagingAdapter
+            pagingAdapter.addLoadStateListener { loadState ->
+                pb.visibility = if (loadState.source.append is LoadState.Loading) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
         }
-        binding.rvSearchWallpapers.layoutManager = rvLayoutManager
-        binding.rvSearchWallpapers.adapter = adapter
-        Log.d(ContentValues.TAG, "setUpWallpapers: $wallpapers")
+        if (query != null) {
+            binding.searchView.visibility = View.INVISIBLE
+            binding.tvCategoryName.visibility = View.VISIBLE
+            binding.tvCategoryName.text = query
+            viewModel.searchWallpaper(query!!)
+        }
     }
 
-    private fun startActivityWithDestination(
-        destination: String,
-        cachedWallpaper: List<Photo>? = null,
-        position: Int? = 0,
-        page: Int? = 0
-    ) {
-        val intent = Intent(requireContext(), ViewWallpaperActivity::class.java).apply {
-            putExtra("destination", destination)
-            val gson = Gson()
-            putExtra("cachedWallpaper", gson.toJson(cachedWallpaper))
-            putExtra("position", position)
-            putExtra("page", page)
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        startForResult.launch(intent)
+    private fun onFavClick(item: Photo) {
+        viewModel.insertFavImage(FavouriteImageDataBase(item.src.portrait))
+    }
+
+    private fun onItemClicked(position: Int) {
+        viewModel.selectedPosition = position
+        findNavController().navigate(
+            R.id.action_searchFragment_to_viewWallpaperFragment, bundleOf("source" to "search")
+        )
     }
 
     override fun setUpClickListeners() {
@@ -98,25 +76,37 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             androidx.appcompat.widget.SearchView.OnQueryTextListener,
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { viewModel.getWallpapers(page++, it, "search") }
-                binding.searchView.setQuery("", false)
-                binding.searchView.clearFocus()
+                query?.let {
+                    binding.pb.visibility = View.VISIBLE
+                    pagingAdapter.refresh()
+                    viewModel.searchWallpaper(it)
+                    binding.searchView.clearFocus()
+                }
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                cachedWallpaper.clear()
                 return true
             }
         })
-
-    }
-
-    override fun setUpObservers() {
-        viewModel.searchWallpapers.observe(viewLifecycleOwner) {
-            cachedWallpaper.addAll(it.photos)
-            setUpWallpapers(cachedWallpaper)
+        binding.imgBackBtn.setOnClickListener {
+            findNavController().navigateUp()
         }
     }
 
+    override fun setUpObservers() {
+        viewModel.searchedWallpapers.observe(viewLifecycleOwner) { pagingData ->
+            pagingAdapter.submitData(lifecycle, pagingData)
+        }
+    }
+
+    override fun onResume() {
+        (requireActivity() as MainActivity).setBottomNavigationVisibility(false)
+        super.onResume()
+    }
+
+    override fun onDestroyView() {
+        (requireActivity() as MainActivity).setBottomNavigationVisibility(true)
+        super.onDestroyView()
+    }
 }
