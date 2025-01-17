@@ -36,4 +36,13 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageView
+        android:id="@+id/selected_fav"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/item_category_bg"
+        android:src="@drawable/ic_selection"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/img_wallpaper"
+        app:layout_constraintTop_toTopOf="@+id/img_wallpaper" />
 </androidx.constraintlayout.widget.ConstraintLayout>

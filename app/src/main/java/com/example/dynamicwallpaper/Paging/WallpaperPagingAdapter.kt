@@ -16,35 +16,52 @@ import com.google.android.material.imageview.ShapeableImageView
 import kotlin.random.Random
 
 class WallpaperPagingAdapter(
-    private val onImageClick: (Int) -> Unit?, private val onFavClick: (Photo) -> Unit?
+    private val onImageClick: (Int) -> Unit, private val onFavClick: (Photo) -> Unit
 ) : PagingDataAdapter<Photo, WallpaperPagingAdapter.WallpaperViewHolder>(COMPARATOR) {
+
     private val rnd = Random
 
     class WallpaperViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ShapeableImageView = itemView.findViewById(R.id.img_wallpaper)
-        val favImg: ConstraintLayout = itemView.findViewById(R.id.ic_fav)
-        fun bind(item: Photo) {
-            Glide.with(itemView.context).load(item.src.portrait).into(imageView)
+        private val imageView: ShapeableImageView = itemView.findViewById(R.id.img_wallpaper)
+        private val favImg: ConstraintLayout = itemView.findViewById(R.id.ic_fav)
+
+        fun bind(
+            item: Photo,
+            onImageClick: (Int) -> Unit,
+            onFavClick: (Photo) -> Unit,
+            position: Int,
+            rnd: Random
+        ) {
+
+            // Load image with Glide
+            Glide.with(itemView.context).load(item.src.portrait)
+                // TODO Add the images to drawable
+//                .placeholder(R.drawable.placeholder) // Add appropriate placeholder
+//                .error(R.drawable.error_image) // Add appropriate error image
+                .into(imageView)
+
+            // Apply random background color
+            imageView.setBackgroundColor(
+                Color.argb(
+                    150, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)
+                )
+            )
+
+            // Set click listeners
+            imageView.setOnClickListener { onImageClick(position) }
+            favImg.setOnClickListener { onFavClick(item) }
         }
     }
 
     override fun onBindViewHolder(holder: WallpaperViewHolder, position: Int) {
-        val item = getItem(position) ?: return
-        val color = Color.argb(200, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
-        holder.imageView.setBackgroundColor(color)
-        holder.bind(item)
-        holder.imageView.setOnClickListener {
-            onImageClick(position)
-        }
-        holder.favImg.setOnClickListener {
-            onFavClick(item)
+        getItem(position)?.let { item ->
+            holder.bind(item, onImageClick, onFavClick, position, rnd)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WallpaperViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.wallpaper_item, parent, false)
-        Log.d("InsidePagingAdapter", "onCreateViewHolder: DataNeeded")
         return WallpaperViewHolder(view)
     }
 

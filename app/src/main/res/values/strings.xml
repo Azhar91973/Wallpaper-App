@@ -13,6 +13,19 @@
     <string name="favorite">Favourite</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="main_recyclerview">Main RecyclerView</string>
+    <string name="home_screen_icon">Home Screen Icon</string>
+    <string name="set_on_home_screen">Set on home screen</string>
+    <string name="lock_screen_icon">Lock Screen Icon</string>
+    <string name="set_on_lock_screen">Set on lock screen</string>
+    <string name="both_screens_icon">Both Screens Icon</string>
+    <string name="set_on_both_screen">Set on both screen</string>
+    <string name="what_would_you_like_to_do">What would you like to do?</string>
+    <string name="play">Play</string>
+    <string name="set_on">Set On</string>
+    <string name="decrement">Decrement</string>
+    <string name="increment">Increment</string>
+    <string name="change_your_wallpaper_every">Change Your Wallpaper Every</string>
 
 
 </resources>

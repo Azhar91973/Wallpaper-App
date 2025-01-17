@@ -18,7 +18,6 @@ import com.example.dynamicwallpaper.databinding.FragmentCategoryBinding
 
 class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
 
-
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentCategoryBinding {
@@ -99,18 +98,16 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
             view.imgCategory.setOnClickListener {
                 findNavController().navigate(
                     R.id.action_categoryFragment_to_searchFragment,
-                    bundleOf("query" to item.categoryName)
+                    bundleOf("query" to item.categoryName, "flag" to true)
                 )
             }
         }
-        binding.rvCategoryItems.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.rvCategoryItems.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvCategoryItems.adapter = cAdapter
     }
 
     override fun setUpClickListeners() {
-        binding.imgBackBtn.setOnClickListener {
-            (requireActivity() as MainActivity).navigateToFragment(R.id.HomeFragment, 0)
-        }
+
     }
 
     override fun setUpObservers() {}

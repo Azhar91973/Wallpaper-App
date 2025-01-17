@@ -31,8 +31,9 @@ class WallpaperPagingSource(
             if(type==null)
                 type = "curated"
             val response = wallpaperApi.getWallpaper(type!!, query, currentPage)
+            Log.d("WallpaperResponse", "load: ${response.photos}")
             return LoadResult.Page(
-                data = response.photos,
+                data = response.photos.shuffled(),
                 prevKey = if (currentPage == 1) null else currentPage - 1,
                 nextKey = if (currentPage == response.total_results) null else currentPage + 1
             )

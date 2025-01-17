@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "favourite_image_DataBase")
 data class FavouriteImageDataBase(
-    @ColumnInfo(name = "imageUrl") var imageUrl: String
+    @ColumnInfo(name = "imageUrl") var imageUrl: String,
+    @ColumnInfo(name = "isSelected") var isSelected: Boolean? = null
 ) {
     @PrimaryKey(autoGenerate = true)
     var id:Int = 0

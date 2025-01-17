@@ -7,6 +7,7 @@ import androidx.viewbinding.ViewBinding
 
 open class BaseAdapter<T> : RecyclerView.Adapter<BaseViewHolder<T>>() {
     var listOfItems: MutableList<T> = mutableListOf()
+    var selectedItemList: MutableList<Int> = mutableListOf()
 
     open var expressionViewHolderBinding: ((T, ViewBinding) -> Unit)? = null
     open var expressionOnCreateViewHolder: ((ViewGroup) -> ViewBinding)? = null
@@ -50,9 +51,9 @@ open class BaseAdapter<T> : RecyclerView.Adapter<BaseViewHolder<T>>() {
         notifyItemInserted(listOfItems.size - 1)
     }
 }
+
 class BaseViewHolder<T> internal constructor(
-    private val binding: ViewBinding,
-    private val expression: (T, ViewBinding) -> Unit
+    private val binding: ViewBinding, private val expression: (T, ViewBinding) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: T) {
         expression(item, binding)

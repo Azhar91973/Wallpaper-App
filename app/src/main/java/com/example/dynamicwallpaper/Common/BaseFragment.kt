@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.snackbar.Snackbar
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
@@ -33,9 +33,9 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
     abstract fun setUpObservers()
 
-    fun showSnackBar(message: String) {
+    fun showToast(message: String) {
         hideKeyboard(requireView())
-        binding.let { Snackbar.make(it.root, message, Snackbar.LENGTH_SHORT).show() }
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun hideKeyboard(view: View) {

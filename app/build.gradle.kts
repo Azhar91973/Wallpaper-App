@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.dynamicwallpaper"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.dynamicwallpaper"
@@ -34,6 +34,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -50,40 +51,63 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Bottom Nav
+    // Lottie Animation
+    implementation("com.airbnb.android:lottie:6.6.2")
+
+    // Smooth Bottom Navigation Bar
     implementation("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
-    // Navigation Dependency
-    val navVersion = "2.7.6"
+
+    // Navigation Components
+    val navVersion = "2.8.5"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
-    // Image Slider
-    implementation("com.github.dangiashish:Auto-Image-Slider:1.0.6")
+
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
     // Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    // okHttp
+    // Dagger Hilt for worker
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    // When using Kotlin.
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
     // Gson
     implementation("com.google.code.gson:gson:2.11.0")
-    // ViewModel
-    val lifecycle_version = "2.8.6"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
-    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
-    // Room DataBase
-    implementation ("androidx.room:room-ktx:2.6.1")
-    implementation ("androidx.activity:activity-ktx:1.9.1")
-    implementation ("androidx.room:room-runtime:2.6.1")
-    kapt ("androidx.room:room-compiler:2.6.1")
-    val paging_version = "3.3.4"
 
-    implementation("androidx.paging:paging-runtime:$paging_version")
+    // Lifecycle Components
+    val lifecycleVersion = "2.8.7"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+
+    // Room Database
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.activity:activity-ktx:1.9.3")
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // Paging 3
+    val pagingVersion = "3.3.5"
+    implementation("androidx.paging:paging-runtime:$pagingVersion")
+
+    // Shimmer Layout
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // Work Manager Kotlin + coroutines
+    val workversion = "2.10.0"
+    implementation("androidx.work:work-runtime-ktx:$workversion")
+}
+kapt {
+    correctErrorTypes = true
 }
