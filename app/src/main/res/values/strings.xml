@@ -26,6 +26,8 @@
     <string name="decrement">Decrement</string>
     <string name="increment">Increment</string>
     <string name="change_your_wallpaper_every">Change Your Wallpaper Every</string>
+    <string name="please_check_your_internet_connection">Please Check Your Internet Connection.</string>
+    <string name="retry">Retry</string>
 
 
 </resources>

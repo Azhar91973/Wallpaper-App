@@ -25,7 +25,7 @@
         android:fontFamily="@font/poppins_semibold"
         android:gravity="center"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="#ffffff"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/img_category"
         app:layout_constraintEnd_toEndOf="@+id/img_category"

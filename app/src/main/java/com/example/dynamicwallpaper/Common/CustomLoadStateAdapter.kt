@@ -25,7 +25,6 @@ class CustomLoadStateAdapter(
         }
 
         fun bind(loadState: LoadState) {
-            // Update UI based on the current load state
             progressBar.visibility = if (loadState is LoadState.Loading) View.VISIBLE else View.GONE
             errorMsg.visibility = if (loadState is LoadState.Error) View.VISIBLE else View.GONE
             retryButton.visibility = if (loadState is LoadState.Error) View.VISIBLE else View.GONE
@@ -40,5 +39,11 @@ class CustomLoadStateAdapter(
 
     override fun onBindViewHolder(holder: LoadStateViewHolder, loadState: LoadState) {
         holder.bind(loadState)
+    }
+
+    // New method to bind the load state to an external view
+    fun bindToView(view: View, loadState: LoadState) {
+        val viewHolder = LoadStateViewHolder(view, retry)
+        viewHolder.bind(loadState)
     }
 }

@@ -11,13 +11,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dynamicwallpaper.Common.BaseFragment
+import com.example.dynamicwallpaper.Common.CustomLoadStateAdapter
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
 import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Models.Photo
-import com.example.dynamicwallpaper.Common.CustomLoadStateAdapter
 import com.example.dynamicwallpaper.Paging.WallpaperPagingAdapter
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.WallpaperViewModel
@@ -35,6 +37,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     companion object {
         const val NAVIGATION_SOURCE = "source"
+        private const val SWIPE_DEBOUNCE_TIME = 300L
     }
 
     override fun inflateBinding(
@@ -45,10 +48,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        detectSwipe()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
+        observeLoadState()
     }
 
     override fun setUpViews() {
@@ -61,6 +64,85 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             adapter =
                 pagingAdapter.withLoadStateFooter(CustomLoadStateAdapter { pagingAdapter.retry() })
         }
+
+        detectSwipe()
+    }
+
+    private fun detectSwipe() {
+        binding.rvWallpapers.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (System.currentTimeMillis() - lastSwipeTime > SWIPE_DEBOUNCE_TIME) {
+                    lastSwipeTime = System.currentTimeMillis()
+                    if (dy > 0) setBottomNavigationVisibility(false)
+                    else if (dy < 0) setBottomNavigationVisibility(true)
+                }
+            }
+        })
+    }
+
+    private fun setBottomNavigationVisibility(isVisible: Boolean) {
+        (requireActivity() as? MainActivity)?.setBottomNavigationVisibility(isVisible)
+    }
+
+    override fun setUpClickListeners() {
+        binding.sv.setOnClickListener {
+            findNavController().navigate(R.id.action_HomeFragment_to_searchFragment)
+        }
+    }
+
+
+    override fun setUpObservers() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.wallpapers.collectLatest { wallpapers ->
+                    pagingAdapter.submitData(lifecycle, wallpapers)
+                }
+            }
+        }
+    }
+
+    private fun observeLoadState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                pagingAdapter.loadStateFlow.collectLatest { loadState ->
+                    handleLoadState(loadState)
+                }
+            }
+        }
+    }
+    private fun handleLoadState(loadState: CombinedLoadStates) {
+        val isListEmpty =
+            loadState.source.refresh is LoadState.NotLoading && pagingAdapter.itemCount == 0
+        val isLoading = loadState.source.refresh is LoadState.Loading
+        val isError = loadState.source.refresh is LoadState.Error
+
+        binding.rvWallpapers.visibility =
+            if (isListEmpty || isError || isLoading) View.GONE else View.VISIBLE
+        binding.loadStateLayout.visibility =
+            if (isListEmpty || isError || isLoading) View.VISIBLE else View.GONE
+
+        if (binding.loadStateLayout.childCount == 0) {
+            val loadStateView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.load_state_footer, binding.loadStateLayout, false)
+            binding.loadStateLayout.addView(loadStateView)
+            bindLoadStateView(loadStateView, loadState.refresh)
+        } else {
+            val loadStateView = binding.loadStateLayout.getChildAt(0)
+            bindLoadStateView(loadStateView, loadState.refresh)
+        }
+    }
+
+    private fun bindLoadStateView(loadStateView: View, loadState: LoadState) {
+        val retryButton: View = loadStateView.findViewById(R.id.retry_button)
+        val progressBar: View = loadStateView.findViewById(R.id.progress_bar)
+        val errorMsg: View = loadStateView.findViewById(R.id.error_msg)
+
+        retryButton.setOnClickListener { pagingAdapter.retry() }
+
+        progressBar.visibility = if (loadState is LoadState.Loading) View.VISIBLE else View.GONE
+        errorMsg.visibility = if (loadState is LoadState.Error) View.VISIBLE else View.GONE
+        retryButton.visibility = if (loadState is LoadState.Error) View.VISIBLE else View.GONE
     }
 
     private fun onFavClick(item: Photo) {
@@ -75,60 +157,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun onItemClicked(position: Int) {
-        Log.d("WallpaperPosition", "Selected Position: $position")
+        Log.d("HomeFragment", "Selected Position: $position")
         viewModel.selectedPosition = position
         findNavController().navigate(
             R.id.action_HomeFragment_to_viewWallpaperFragment, bundleOf(NAVIGATION_SOURCE to "home")
         )
-    }
-
-    private fun detectSwipe() {
-        binding.rvWallpapers.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (System.currentTimeMillis() - lastSwipeTime > 300) {
-                    lastSwipeTime = System.currentTimeMillis()
-                    if (dy > 0) onSwipeUp() else if (dy < 0) onSwipeDown()
-                }
-            }
-        })
-    }
-
-    private fun onSwipeUp() {
-        if ((requireActivity() as MainActivity).getBottomNavStatus()) {
-            (requireActivity() as MainActivity).setBottomNavigationVisibility(false)
-        }
-    }
-
-    private fun onSwipeDown() {
-        if (!(requireActivity() as MainActivity).getBottomNavStatus()) {
-            (requireActivity() as MainActivity).setBottomNavigationVisibility(true)
-        }
-    }
-
-    override fun setUpClickListeners() {
-        binding.sv.setOnClickListener {
-            findNavController().navigate(R.id.action_HomeFragment_to_searchFragment)
-        }
-    }
-
-    override fun setUpObservers() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.wallpapers.collectLatest { wallpapers ->
-                    pagingAdapter.submitData(lifecycle, wallpapers)
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            pagingAdapter.loadStateFlow.collectLatest { loadState ->
-                val errorState = loadState.source.refresh as? androidx.paging.LoadState.Error
-                errorState?.let {
-                    showToast("Error loading data: ${it.error.localizedMessage}")
-                }
-            }
-        }
     }
 
     override fun onPause() {
@@ -139,9 +172,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.recyclerViewState?.let {
-            if (pagingAdapter.itemCount > 0) {
-                binding.rvWallpapers.layoutManager?.onRestoreInstanceState(it)
-            }
+            binding.rvWallpapers.layoutManager?.onRestoreInstanceState(it)
         }
     }
 }

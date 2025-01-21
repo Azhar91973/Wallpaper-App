@@ -30,6 +30,7 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_wallpapers"
         android:layout_width="0dp"
@@ -38,24 +39,19 @@
         android:layout_marginTop="5dp"
         android:contentDescription="@string/main_recyclerview"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/pb"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_category"
         app:spanCount="3"
-        tools:listitem="@layout/wallpaper_item"/>
+        tools:listitem="@layout/wallpaper_item" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/pb"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_centerInParent="true"
-        android:elevation="3dp"
-        android:visibility="gone"
+    <FrameLayout
+        android:id="@+id/load_state_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/loader" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

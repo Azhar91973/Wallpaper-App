@@ -1,8 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
-    <!-- Base theme for the app -->
     <style name="Base.Theme.DynamicWallpaper" parent="Theme.Material3.DayNight.NoActionBar">
-        
         <!-- Set the default window background color -->
         <item name="android:windowBackground">@color/white</item>
 
@@ -13,14 +12,10 @@
         <!-- Adjust the light/dark content of the status bar based on the theme -->
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
 
-    </style>
+        <!-- Optional: Navigation bar light icons based on the theme -->
+        <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
 
-    <!-- App-specific theme -->
-    <style name="Theme.DynamicWallpaper" parent="Base.Theme.DynamicWallpaper">
-        <!-- Add any app-specific customizations here if needed -->
-        <item name="isLightTheme">true</item>
+        <!-- Set the color for navigation bar divider if needed -->
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
     </style>
-
-    <style name="Base.Theme.DynamicWallpaper.Dark" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="isLightTheme">false</item></style>
 </resources>
