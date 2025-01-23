@@ -10,4 +10,7 @@
     <color name="bottomNavIcon">#FF000000</color>
     <color name="btnBg">#80CBCDD5</color>
     <color name="fade">#77000000</color>
+
+    <color name="track_daymode">#212121</color>
+    <color name="track_nightmode">#E0E0E0</color>
 </resources>

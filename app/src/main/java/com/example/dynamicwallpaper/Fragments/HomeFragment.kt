@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +26,7 @@ import com.example.dynamicwallpaper.Paging.WallpaperPagingAdapter
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.WallpaperViewModel
 import com.example.dynamicwallpaper.databinding.FragmentHomeBinding
+import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -34,6 +37,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel: WallpaperViewModel by activityViewModels()
     private lateinit var pagingAdapter: WallpaperPagingAdapter
     private var lastSwipeTime = 0L
+    private lateinit var drawerLayout: DrawerLayout
 
     companion object {
         const val NAVIGATION_SOURCE = "source"
@@ -48,11 +52,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpDrawerLayout()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
         observeLoadState()
     }
+
+    private fun setUpDrawerLayout() {
+        drawerLayout = (requireActivity() as MainActivity).drawerLayout
+        val navigationView: NavigationView = (requireActivity() as MainActivity).navigationView
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.drawer_setting -> {
+                    findNavController().navigate(R.id.action_HomeFragment_to_settingFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+            }
+            true
+        }
+    }
+
 
     override fun setUpViews() {
         pagingAdapter = WallpaperPagingAdapter(::onItemClicked, ::onFavClick)
@@ -89,6 +109,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         binding.sv.setOnClickListener {
             findNavController().navigate(R.id.action_HomeFragment_to_searchFragment)
         }
+        binding.icMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
     }
 
 
@@ -111,6 +134,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
     }
+
     private fun handleLoadState(loadState: CombinedLoadStates) {
         val isListEmpty =
             loadState.source.refresh is LoadState.NotLoading && pagingAdapter.itemCount == 0

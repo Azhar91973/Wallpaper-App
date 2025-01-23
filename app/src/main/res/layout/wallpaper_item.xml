@@ -40,7 +40,7 @@
         android:id="@+id/selected_fav"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@drawable/item_category_bg"
+        android:background="@drawable/favourite_bg"
         android:src="@drawable/ic_selection"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/img_wallpaper"

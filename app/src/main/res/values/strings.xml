@@ -1,18 +1,14 @@
 <resources>
     <string name="app_name">Dynamic Wallpaper</string>
     <string name="Home">Home</string>
-    <string name="search">Search</string>
     <string name="category">Category</string>
     <string name="favourites">Favourites</string>
     <string name="setting">Setting</string>
     <string name="find_wallpaper">Find Wallpaper..</string>
-    <string name="view_all">View All</string>
     <string name="img">Img</string>
     <string name="share">Share</string>
     <string name="set">SET</string>
     <string name="favorite">Favourite</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="main_recyclerview">Main RecyclerView</string>
     <string name="home_screen_icon">Home Screen Icon</string>
     <string name="set_on_home_screen">Set on home screen</string>
@@ -28,6 +24,6 @@
     <string name="change_your_wallpaper_every">Change Your Wallpaper Every</string>
     <string name="please_check_your_internet_connection">Please Check Your Internet Connection.</string>
     <string name="retry">Retry</string>
-
+    <string name="theme_text">Switch To Dark Mode</string>
 
 </resources>

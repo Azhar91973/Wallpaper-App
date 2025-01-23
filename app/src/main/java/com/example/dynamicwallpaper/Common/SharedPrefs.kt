@@ -2,6 +2,7 @@ package com.example.dynamicwallpaper.Common
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -10,6 +11,8 @@ class SharedPrefs(context: Context) {
         const val RECENT_SEARCH_LIST = "RecentSearch"
         const val INDEX = "IndexValue"
         const val WALLPAPER_SET_TYPE = "SetType"
+        private const val PREF_NAME = "ThemePref" // SharedPreferences file name
+        private const val KEY_IS_DARK_MODE = "isDarkMode" // Key for theme preference
     }
 
     private val sharedPreferences: SharedPreferences =
@@ -67,5 +70,13 @@ class SharedPrefs(context: Context) {
         val list = getListFromPreferences(key)
         list.clear()
         saveListToPreferences(key, list)
+    }
+    fun saveThemePreference(isDarkMode: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
+        editor.apply()
+    }
+    fun isDarkMode(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IS_DARK_MODE, false)
     }
 }

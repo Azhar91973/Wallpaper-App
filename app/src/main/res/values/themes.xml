@@ -1,11 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base theme for the app -->
     <style name="Base.Theme.DynamicWallpaper" parent="Theme.Material3.DayNight.NoActionBar">
-        
+
         <!-- Set the default window background color -->
         <item name="android:windowBackground">@color/white</item>
-
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryVariant">@color/primary_color</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorOnPrimary">@color/white</item>
         <!-- Transparent system bars for edge-to-edge UI -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -20,7 +23,4 @@
         <!-- Add any app-specific customizations here if needed -->
         <item name="isLightTheme">true</item>
     </style>
-
-    <style name="Base.Theme.DynamicWallpaper.Dark" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="isLightTheme">false</item></style>
 </resources>

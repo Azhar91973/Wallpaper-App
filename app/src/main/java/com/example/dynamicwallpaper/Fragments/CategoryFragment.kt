@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dynamicwallpaper.Common.BaseAdapter
 import com.example.dynamicwallpaper.Common.BaseFragment
-import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Models.CategoryItems
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.databinding.CategoryItemBinding
@@ -83,6 +82,9 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
             ), CategoryItems(
                 "https://images.pexels.com/photos/33045/lion-wild-africa-african.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                 "Wildlife"
+            ), CategoryItems(
+                "https://images.pexels.com/photos/333850/pexels-photo-333850.jpeg?auto=compress&cs=tinysrgb",
+                "Dark"
             )
         )
 

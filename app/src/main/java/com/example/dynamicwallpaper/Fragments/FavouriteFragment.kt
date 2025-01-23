@@ -55,7 +55,6 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
     }
 
     override fun setUpViews() {
-        // Getting Favourite Images from room database
         viewModel.getAllFavImages()
     }
 

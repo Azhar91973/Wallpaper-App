@@ -4,8 +4,8 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">10%</item>
     </style>
-    <style name="PopupAnimation">
-        <item name="android:windowEnterAnimation">@anim/slide_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_out</item>
+    <style name="menuItemStyle" parent="TextAppearance.AppCompat.Body1">
+        <item name="fontFamily">@font/poppins_regular</item>
     </style>
+
 </resources>

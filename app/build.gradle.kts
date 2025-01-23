@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "com.example.dynamicwallpaper"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -57,8 +57,8 @@ dependencies {
 
     // Navigation Components
     val navVersion = "2.8.5"
-    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
-    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -97,7 +97,7 @@ dependencies {
 
     // Paging 3
     val pagingVersion = "3.3.5"
-    implementation("androidx.paging:paging-runtime:$pagingVersion")
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
 
     // Shimmer Layout
     implementation("com.facebook.shimmer:shimmer:0.5.0")
