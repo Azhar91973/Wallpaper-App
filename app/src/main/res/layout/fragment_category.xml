@@ -6,12 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.CategoryFragment">
 
-
+    <ImageView
+        android:id="@+id/ic_menu"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/ic_menu"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/tv_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="@font/poppins_bold"
         android:text="@string/category"
         android:textColor="@color/primary_color"

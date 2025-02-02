@@ -5,15 +5,15 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/tv_searched_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_search"
         android:fontFamily="@font/poppins_regular"
-        android:gravity="start"
+        android:gravity="center_vertical"
         android:textColor="@color/primary_color"
         android:textSize="14sp"
+        app:drawableStartCompat="@drawable/ic_search"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/img_remove"
         app:layout_constraintStart_toStartOf="parent"

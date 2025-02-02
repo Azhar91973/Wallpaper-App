@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Dynamic Wallpaper</string>
-    <string name="Home">Home</string>
+    <string name="home">Home</string>
     <string name="category">Category</string>
     <string name="favourites">Favourites</string>
     <string name="setting">Setting</string>
@@ -25,5 +25,24 @@
     <string name="please_check_your_internet_connection">Please Check Your Internet Connection.</string>
     <string name="retry">Retry</string>
     <string name="theme_text">Switch To Dark Mode</string>
+    <string name="no_favourites">No Favourites</string>
+    <string name="explore_wallpapers">Explore Wallpapers</string>
+    <string name="menu_icon">Menu Icon</string>
+    <string name="error_loading_wallpapers">Error Loading Wallpapers!!</string>
+    <string name="image_added_to_favourite">Image Added To Favourite</string>
+    <string name="image_already_in_fav">Image Already in Favourites</string>
+    <string name="clear_all">Clear All</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="play_wallpaper_info">Please select at least 2 wallpapers to play!</string>
+    <string name="minutes">Minutes</string>
+    <string name="hours">Hours</string>
+    <string name="days">Days</string>
+    <string name="homescreen">HomeScreen</string>
+    <string name="lockscreen">LockScreen</string>
+    <string name="both">Both</string>
+    <string name="wallpaper_change_scheduled">Wallpaper change scheduled</string>
+    <string name="image_url_is_invalid">Image URL is invalid.</string>
+    <string name="wallpaper_set_successfully">Wallpaper Set Successfully</string>
+    <string name="failed_to_set_wallpaper">Failed to set wallpaper</string>
 
 </resources>

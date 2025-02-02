@@ -28,7 +28,7 @@
         android:gravity="center"
         android:padding="8dp"
         android:text="@string/please_check_your_internet_connection"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_red_light"
         android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

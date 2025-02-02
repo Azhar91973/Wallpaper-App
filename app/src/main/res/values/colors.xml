@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="splash_color">#29323B</color>
     <color name="primary_color">#29323B</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#F0F0F0</color>
@@ -8,5 +9,4 @@
     <color name="indicatorColor">#F0F0F0</color>
     <color name="btnBg">#80191E31</color>
     <color name="fade">#77000000</color>
-
 </resources>

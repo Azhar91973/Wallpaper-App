@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -15,8 +18,12 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val prop = Properties().apply {
+            load(FileInputStream(File(rootProject.rootDir, "local.properties")))
+        }
+        val apiKey = prop.getProperty("api_key")
+        buildConfigField("String", "API_KEY", apiKey)
     }
 
     buildTypes {
@@ -28,6 +35,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
     compileOptions {
@@ -53,58 +61,54 @@ dependencies {
 
 
     // Smooth Bottom Navigation Bar
-    implementation("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
+    implementation(libs.smoothbottombar)
 
     // Navigation Components
-    val navVersion = "2.8.5"
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
 
     // Dagger Hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
     // Dagger Hilt for worker
-    implementation("androidx.hilt:hilt-work:1.2.0")
+    implementation(libs.androidx.hilt.work)
     // When using Kotlin.
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    kapt(libs.androidx.hilt.compiler)
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // Gson
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation(libs.gson)
 
     // Lifecycle Components
-    val lifecycleVersion = "2.8.7"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    kapt(libs.androidx.lifecycle.compiler)
 
     // Room Database
-    implementation("androidx.room:room-ktx:2.6.1")
-    implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
 
     // Paging 3
-    val pagingVersion = "3.3.5"
-    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation(libs.androidx.paging.runtime.ktx)
 
     // Shimmer Layout
-    implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation(libs.shimmer)
 
     // Work Manager Kotlin + coroutines
-    val workversion = "2.10.0"
-    implementation("androidx.work:work-runtime-ktx:$workversion")
+    implementation(libs.androidx.work.runtime.ktx)
 }
 kapt {
     correctErrorTypes = true

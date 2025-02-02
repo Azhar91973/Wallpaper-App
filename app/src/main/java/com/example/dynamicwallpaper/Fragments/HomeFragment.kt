@@ -45,7 +45,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
+        inflater: LayoutInflater, container: ViewGroup?,
     ): FragmentHomeBinding {
         return FragmentHomeBinding.inflate(inflater, container, false)
     }
@@ -173,9 +173,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewModel.getImageByUrl(item.src.portrait) { isPresent ->
             if (!isPresent) {
                 viewModel.insertFavImage(FavouriteImageDataBase(item.src.portrait))
-                showToast("Image Added To Favourites")
+                showToast(getString(R.string.image_added_to_favourite))
             } else {
-                showToast("Image Already in Favourites")
+                showToast(getString(R.string.image_already_in_fav))
             }
         }
     }

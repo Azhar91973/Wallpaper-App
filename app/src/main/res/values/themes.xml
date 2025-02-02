@@ -1,26 +1,15 @@
 <resources>
 
-    <!-- Base theme for the app -->
-    <style name="Base.Theme.DynamicWallpaper" parent="Theme.Material3.DayNight.NoActionBar">
-
-        <!-- Set the default window background color -->
+    <style name="Theme.DynamicWallpaper" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
         <item name="colorPrimary">@color/primary_color</item>
         <item name="colorPrimaryVariant">@color/primary_color</item>
-        <item name="colorPrimaryDark">#000000</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- Transparent system bars for edge-to-edge UI -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <!-- Adjust the light/dark content of the status bar based on the theme -->
-        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
-
     </style>
 
-    <!-- App-specific theme -->
-    <style name="Theme.DynamicWallpaper" parent="Base.Theme.DynamicWallpaper">
-        <!-- Add any app-specific customizations here if needed -->
-        <item name="isLightTheme">true</item>
+    <style name="splashscreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen_item</item>
     </style>
 </resources>

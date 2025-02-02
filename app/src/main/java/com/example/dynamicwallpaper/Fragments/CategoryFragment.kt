@@ -5,26 +5,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dynamicwallpaper.Common.BaseAdapter
 import com.example.dynamicwallpaper.Common.BaseFragment
+import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Models.CategoryItems
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.databinding.CategoryItemBinding
 import com.example.dynamicwallpaper.databinding.FragmentCategoryBinding
+import com.google.android.material.navigation.NavigationView
 
 class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
-
+    private lateinit var drawerLayout: DrawerLayout
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
+        inflater: LayoutInflater, container: ViewGroup?,
     ): FragmentCategoryBinding {
         return FragmentCategoryBinding.inflate(inflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        drawerLayout = (requireActivity() as MainActivity).drawerLayout
+        setUpDrawerLayout()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
@@ -58,8 +64,8 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
             ), CategoryItems(
                 "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg", "Gaming"
             ), CategoryItems(
-                "https://images.pexels.com/photos/36029/aroni-arsa-children-little.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-                "Girl"
+                "https://images.pexels.com/photos/147411/italy-mountains-dawn-daybreak-147411.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+                "Landscape"
             ), CategoryItems(
                 "https://images.pexels.com/photos/216798/pexels-photo-216798.jpeg", "Nature"
             ), CategoryItems(
@@ -108,8 +114,24 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
         binding.rvCategoryItems.adapter = cAdapter
     }
 
-    override fun setUpClickListeners() {
+    private fun setUpDrawerLayout() {
+        drawerLayout = (requireActivity() as MainActivity).drawerLayout
+        val navigationView: NavigationView = (requireActivity() as MainActivity).navigationView
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.drawer_setting -> {
+                    findNavController().navigate(R.id.action_categoryFragment_to_settingFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+            }
+            true
+        }
+    }
 
+    override fun setUpClickListeners() {
+        binding.icMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
     }
 
     override fun setUpObservers() {}

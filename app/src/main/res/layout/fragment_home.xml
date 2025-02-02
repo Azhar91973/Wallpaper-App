@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/ic_menu"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:src="@drawable/ic_menu"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:fontFamily="@font/poppins_bold"
-        android:text="@string/Home"
+        android:text="@string/home"
         android:textColor="@color/primary_color"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="@+id/sv"

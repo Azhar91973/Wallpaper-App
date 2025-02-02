@@ -1,5 +1,6 @@
 package com.example.dynamicwallpaper
 
+import androidx.lifecycle.LiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -7,8 +8,13 @@ import com.example.dynamicwallpaper.Database.Dao
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
 import com.example.dynamicwallpaper.Models.Photo
 import com.example.dynamicwallpaper.Network.WallpaperApi
+import com.example.dynamicwallpaper.Paging.SearchWallpapersPagingSource
 import com.example.dynamicwallpaper.Paging.WallpaperPagingSource
+import com.example.dynamicwallpaper.Utils.Constants.MAX_SIZE
+import com.example.dynamicwallpaper.Utils.Constants.PER_PAGE_ITEMS
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class WallpaperRepository @Inject constructor(
@@ -18,14 +24,23 @@ class WallpaperRepository @Inject constructor(
     /**
      * Fetch wallpapers with optional type and query parameters using a PagingSource.
      */
-    fun getWallpapers(type: String? = null, query: String? = null): Flow<PagingData<Photo>> {
+    fun getWallpapers(): Flow<PagingData<Photo>> {
         return Pager(config = PagingConfig(
-            pageSize = 80,
-            maxSize = 480,
-            enablePlaceholders = false // Disable placeholders for better user experience
+            pageSize = PER_PAGE_ITEMS,
+            maxSize = MAX_SIZE,
+            enablePlaceholders = false
         ), pagingSourceFactory = {
-            WallpaperPagingSource(wallpaperApi, type, query)
-        }).flow // Use Flow instead of LiveData for better coroutine support
+            WallpaperPagingSource(wallpaperApi)
+        }).flow
+    }
+    fun searchWallpapers(query: String): Flow<PagingData<Photo>> {
+        return Pager(config = PagingConfig(
+            pageSize = PER_PAGE_ITEMS,
+            maxSize = MAX_SIZE,
+            enablePlaceholders = false
+        ), pagingSourceFactory = {
+            SearchWallpapersPagingSource(wallpaperApi,query)
+        }).flow
     }
 
     /**
@@ -73,7 +88,7 @@ class WallpaperRepository @Inject constructor(
     /**
      * Fetch all favorite images from the database.
      */
-    suspend fun getAllFavImages(): List<FavouriteImageDataBase> {
+    fun getAllFavImages(): Flow<List<FavouriteImageDataBase>> {
         return favImageDao.getAllFavImages()
     }
 }

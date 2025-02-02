@@ -6,12 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.FavouriteFragment">
 
+    <ImageView
+        android:id="@+id/ic_menu"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:contentDescription="@string/menu_icon"
+        android:src="@drawable/ic_menu"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_favourite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="@font/poppins_bold"
         android:text="@string/favorite"
         android:textColor="@color/primary_color"
@@ -24,7 +34,7 @@
         android:id="@+id/btn_delete"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:contentDescription="@string/img"
         android:src="@drawable/ic_delete"
@@ -34,14 +44,60 @@
 
     <ImageView
         android:id="@+id/option"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="5dp"
         android:contentDescription="@string/img"
         android:src="@drawable/ic_play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/no_fav_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_favourite">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/no_favourites"
+            android:src="@drawable/ic_no_fav" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:gravity="center"
+            android:text="@string/no_favourites"
+            android:textAlignment="center"
+            android:textColor="@color/primary_color"
+            android:textSize="18sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_explore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/custom_menu_bg"
+            android:backgroundTint="@android:color/holo_blue_light"
+            android:fontFamily="@font/poppins_semibold"
+            android:padding="8dp"
+            android:text="@string/explore_wallpapers"
+            android:textColor="@color/primary_color"
+            android:textSize="14sp" />
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_fav_wallpapers"
@@ -54,6 +110,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_favourite"
-        app:layout_constraintVertical_bias="0.0"
         app:spanCount="3" />
 </androidx.constraintlayout.widget.ConstraintLayout>

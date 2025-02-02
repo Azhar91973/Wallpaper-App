@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="splash_color">#29323B</color>
     <color name="primary_color">#FFFFFFFF</color>
     <color name="white">#29323B</color>
     <color name="grey">#303030</color>
     <color name="light_grey">#424242</color>
-    <color name="blue">#3399FF</color>
     <color name="itemActive">#B0B3B8</color>
     <color name="indicatorColor">#424242</color>
-    <color name="bottomNavIcon">#FF000000</color>
     <color name="btnBg">#80CBCDD5</color>
     <color name="fade">#77000000</color>
-
-    <color name="track_daymode">#212121</color>
-    <color name="track_nightmode">#E0E0E0</color>
 </resources>

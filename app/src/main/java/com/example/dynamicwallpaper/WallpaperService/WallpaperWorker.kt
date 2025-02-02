@@ -16,22 +16,22 @@ import dagger.assisted.AssistedInject
 class WallpaperWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
-    private val wallpaperRepository: WallpaperRepository // No @Assisted
+    private val wallpaperRepository: WallpaperRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         val prefs = SharedPrefs(context)
-        val currentIndex = prefs.getInt(INDEX)
-        val wallpaperSetType = prefs.getWallpaperSetType(WALLPAPER_SET_TYPE)
+        val currentIndex = prefs.getInt()
+        val wallpaperSetType = prefs.getWallpaperSetType()
         val selectedWallpaperList = wallpaperRepository.getSelectedImages()
         Log.d("InsideWorker", "doWork: ${selectedWallpaperList.size}")
         WallpaperHelper(context).setWallpaper(
             selectedWallpaperList[currentIndex].imageUrl, wallpaperSetType
         )
         if (currentIndex + 1 < selectedWallpaperList.size) prefs.saveInt(
-            INDEX, currentIndex + 1
+            currentIndex + 1
         )
-        else prefs.saveInt(INDEX, 0)
+        else prefs.saveInt(0)
         return Result.success()
     }
 }

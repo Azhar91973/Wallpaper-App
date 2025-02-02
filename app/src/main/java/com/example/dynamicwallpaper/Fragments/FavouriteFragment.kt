@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.work.PeriodicWorkRequest
@@ -22,9 +28,8 @@ import com.bumptech.glide.Glide
 import com.example.dynamicwallpaper.Common.BaseAdapter
 import com.example.dynamicwallpaper.Common.BaseFragment
 import com.example.dynamicwallpaper.Common.SharedPrefs
-import com.example.dynamicwallpaper.Common.SharedPrefs.Companion.INDEX
-import com.example.dynamicwallpaper.Common.SharedPrefs.Companion.WALLPAPER_SET_TYPE
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
+import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.WallpaperService.WallpaperHelper.Companion.BOTH_SCREENS
 import com.example.dynamicwallpaper.WallpaperService.WallpaperHelper.Companion.HOME_SCREEN
@@ -33,30 +38,33 @@ import com.example.dynamicwallpaper.WallpaperService.WallpaperWorker
 import com.example.dynamicwallpaper.WallpaperViewModel
 import com.example.dynamicwallpaper.databinding.FragmentFavouriteBinding
 import com.example.dynamicwallpaper.databinding.WallpaperItemBinding
+import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
     private val viewModel: WallpaperViewModel by activityViewModels()
     private lateinit var adapter: BaseAdapter<FavouriteImageDataBase>
+    private lateinit var drawerLayout: DrawerLayout
     private var isSelected: Boolean = false
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
+        inflater: LayoutInflater, container: ViewGroup?,
     ): FragmentFavouriteBinding {
         return FragmentFavouriteBinding.inflate(inflater, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpDrawerLayout()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
     }
 
-    override fun setUpViews() {
-        viewModel.getAllFavImages()
-    }
+    override fun setUpViews() {}
 
     private fun setUpWallpapers(wallpapers: List<FavouriteImageDataBase>) {
         adapter = BaseAdapter()
@@ -86,6 +94,7 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
                     toggleSelection(idx)
                 } else {
                     viewModel.selectedPosition = idx
+                    Log.d("FavPosition", "setUpWallpapers: Position = $idx")
                     findNavController().navigate(
                         R.id.action_favouriteFragment_to_viewWallpaperFragment,
                         bundleOf("source" to "Favourite")
@@ -106,6 +115,20 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
         binding.rvFavWallpapers.adapter = adapter
     }
 
+    private fun setUpDrawerLayout() {
+        drawerLayout = (requireActivity() as MainActivity).drawerLayout
+        val navigationView: NavigationView = (requireActivity() as MainActivity).navigationView
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.drawer_setting -> {
+                    findNavController().navigate(R.id.action_favouriteFragment_to_settingFragment)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+            }
+            true
+        }
+    }
+
     override fun setUpClickListeners() {
         binding.btnDelete.setOnClickListener {
             val indicesToRemove = adapter.selectedItemList.sortedDescending()
@@ -117,10 +140,17 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             isSelected = false
             adapter.selectedItemList.clear()
             updateDeleteButtonVisibility()
+            if (adapter.listOfItems.isEmpty()) setUpEmptyFavLayout()
         }
         binding.option.setOnClickListener {
             if (adapter.selectedItemList.size > 1) openDialog()
-            else showToast("Please select at least 2 wallpapers to play!")
+            else showToast(getString(R.string.play_wallpaper_info))
+        }
+        binding.icMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+        binding.btnExplore.setOnClickListener {
+            (requireActivity() as MainActivity).onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -142,12 +172,18 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             setOnDropdown.findViewById<AutoCompleteTextView>(R.id.auto_complete_text)
 
         // Dropdown options
-        val durationOptions = listOf("Minutes", "Hours", "Days")
-        val setOnOptions = listOf("HomeScreen", "LockScreen", "Both")
+        val durationOptions = listOf(
+            getString(R.string.minutes), getString(R.string.hours), getString(
+                R.string.days
+            )
+        )
+        val setOnOptions = listOf(
+            getString(R.string.homescreen), getString(R.string.lockscreen), getString(R.string.both)
+        )
 
         // Helper function to setup dropdown
         fun setupDropdown(
-            view: AutoCompleteTextView, options: List<String>, defaultOption: String
+            view: AutoCompleteTextView, options: List<String>, defaultOption: String,
         ) {
             view.setAdapter(
                 ArrayAdapter(
@@ -171,7 +207,7 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val selectedDuration = s.toString()
-                quantity = if (selectedDuration == "Minutes") 15 else 1
+                quantity = if (selectedDuration == getString(R.string.minutes)) 15 else 1
                 tvQuantity.text = quantity.toString()
             }
         })
@@ -183,7 +219,7 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
         }
         btnDecrement.setOnClickListener {
             val minQuantity =
-                if (durationAutoCompleteTextView.text.toString() == "Minutes") 15 else 1
+                if (durationAutoCompleteTextView.text.toString() == getString(R.string.minutes)) 15 else 1
             if (quantity > minQuantity) {
                 quantity--
                 tvQuantity.text = quantity.toString()
@@ -195,15 +231,15 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             val selectedDuration = durationAutoCompleteTextView.text.toString()
             val selectedSetOn = setOnAutoCompleteTextView.text.toString()
             val timeUnit = when (selectedDuration) {
-                "Minutes" -> TimeUnit.MINUTES
-                "Hours" -> TimeUnit.HOURS
-                "Days" -> TimeUnit.DAYS
+                getString(R.string.minutes) -> TimeUnit.MINUTES
+                getString(R.string.hours) -> TimeUnit.HOURS
+                getString(R.string.days) -> TimeUnit.DAYS
                 else -> throw IllegalArgumentException("Invalid duration")
             }
             val setType = when (selectedSetOn) {
-                "HomeScreen" -> HOME_SCREEN
-                "LockScreen" -> LOCK_SCREEN
-                "Both" -> BOTH_SCREENS
+                getString(R.string.homescreen) -> HOME_SCREEN
+                getString(R.string.lockscreen) -> LOCK_SCREEN
+                getString(R.string.both) -> BOTH_SCREENS
                 else -> throw IllegalArgumentException("Invalid duration")
             }
             scheduleWork(quantity, timeUnit, setType)
@@ -223,8 +259,8 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
         // Reset previous selections and configurations
         viewModel.resetSelectedWallpapers()
         val prefs = SharedPrefs(requireContext())
-        prefs.saveInt(INDEX, 0)
-        prefs.saveWallpaperSetType(WALLPAPER_SET_TYPE, wallpaperSetType)
+        prefs.saveInt(0)
+        prefs.saveWallpaperSetType(wallpaperSetType)
         WorkManager.getInstance(requireContext()).cancelAllWork()
         viewModel.markSelectedImages(selectedWallpaperIds)
         // Start the periodic worker request
@@ -232,7 +268,7 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             PeriodicWorkRequest.Builder(WallpaperWorker::class.java, quantity.toLong(), duration)
                 .build()
         WorkManager.getInstance(requireContext()).enqueue(periodicWorkRequest)
-        showToast("Wallpaper change scheduled")
+        showToast(getString(R.string.wallpaper_change_scheduled))
     }
 
     private fun toggleSelection(position: Int) {
@@ -255,8 +291,18 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
     }
 
     override fun setUpObservers() {
-        viewModel.favWallpapers.observe(viewLifecycleOwner) {
-            setUpWallpapers(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favWallpapers.collectLatest { favWallpaperList ->
+                    setUpWallpapers(favWallpaperList)
+                    if (adapter.listOfItems.size == 0) setUpEmptyFavLayout()
+                }
+            }
         }
+    }
+
+    private fun setUpEmptyFavLayout() {
+        binding.rvFavWallpapers.visibility = View.GONE
+        binding.noFavLayout.visibility = View.VISIBLE
     }
 }

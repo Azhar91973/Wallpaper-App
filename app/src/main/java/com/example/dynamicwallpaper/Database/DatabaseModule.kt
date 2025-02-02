@@ -2,6 +2,7 @@ package com.example.dynamicwallpaper.Database
 
 import android.content.Context
 import androidx.room.Room
+import com.example.dynamicwallpaper.Utils.Constants.FAVOURITE_IMAGE_DATABASE
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +18,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): DatabaseInstance {
         return Room.databaseBuilder(
-            context, DatabaseInstance::class.java, "favourite_image_database"
+            context, DatabaseInstance::class.java, FAVOURITE_IMAGE_DATABASE
         ).build()
     }
 

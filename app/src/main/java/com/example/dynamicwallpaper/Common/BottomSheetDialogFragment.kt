@@ -32,7 +32,7 @@ class MyBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentBottomSheetDialogBinding.inflate(inflater, container, false)
 
@@ -73,7 +73,9 @@ class MyBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showError() {
-        Toast.makeText(requireContext(), "Image URL is invalid.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            requireContext(), getString(R.string.image_url_is_invalid), Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {

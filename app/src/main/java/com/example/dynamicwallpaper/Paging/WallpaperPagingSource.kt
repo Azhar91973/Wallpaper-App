@@ -8,9 +8,7 @@ import com.example.dynamicwallpaper.Network.WallpaperApi
 
 
 class WallpaperPagingSource(
-    private val wallpaperApi: WallpaperApi,
-    private var type: String?,
-    private val query: String?
+    private val wallpaperApi: WallpaperApi
 ) : PagingSource<Int, Photo>() {
     override fun getRefreshKey(state: PagingState<Int, Photo>): Int? {
 
@@ -28,9 +26,7 @@ class WallpaperPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
         try {
             val currentPage = params.key ?: 1
-            if(type==null)
-                type = "curated"
-            val response = wallpaperApi.getWallpaper(type!!, query, currentPage)
+            val response = wallpaperApi.getWallpaper(currentPage)
             Log.d("WallpaperResponse", "load: ${response.photos}")
             return LoadResult.Page(
                 data = response.photos.shuffled(),

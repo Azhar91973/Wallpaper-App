@@ -1,6 +1,7 @@
 package com.example.dynamicwallpaper.Fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +16,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dynamicwallpaper.Common.BaseFragment
+import com.example.dynamicwallpaper.Common.CustomLoadStateAdapter
 import com.example.dynamicwallpaper.Common.RecentSearchAdapter
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
 import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Models.Photo
-import com.example.dynamicwallpaper.Common.CustomLoadStateAdapter
 import com.example.dynamicwallpaper.Paging.WallpaperPagingAdapter
 import com.example.dynamicwallpaper.R
 import com.example.dynamicwallpaper.WallpaperViewModel
@@ -37,12 +38,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     private var query: String? = null
 
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
+        inflater: LayoutInflater, container: ViewGroup?,
     ): FragmentSearchBinding = FragmentSearchBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        query = arguments?.getString("query")
+        handleNavArguments()
         setUpViews()
         setUpObservers()
         setUpClickListeners()
@@ -58,8 +59,21 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             adapter =
                 pagingAdapter.withLoadStateFooter(footer = CustomLoadStateAdapter { pagingAdapter.retry() })
         }
-        // Handle arguments for query and category
-        arguments?.getString("query")?.let { query ->
+
+        if (!(viewModel.hasSearched) && query == null) {
+            viewModel.hasSearched = true
+            setUpRecentSearch() // Show recent searches only if user j
+        } else {
+            rvSearchWallpapers.visibility = View.VISIBLE
+            recentSearchLayout.visibility = View.GONE
+            tvNoResult.visibility = View.GONE
+        }
+    }
+
+
+    private fun handleNavArguments() = with(binding) {
+        query = arguments?.getString("query")
+        query?.let { query ->
             searchView.visibility = View.INVISIBLE
             tvCategoryName.apply {
                 visibility = View.VISIBLE
@@ -73,14 +87,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 arguments?.remove("flag")
             }
         }
-        // Set up recent searches if no query
-        if (viewModel.searchedWallpapers.value == null && arguments?.getString("query") == null) {
-            setUpRecentSearch()
-        }
     }
 
     private fun setUpRecentSearch() = with(binding) {
         val recentSearch = viewModel.getRecentSearchList(requireContext())
+        Log.d("RecentSearchList", "setUpRecentSearch: $recentSearch")
         if (recentSearch.isEmpty()) return
         rvSearchWallpapers.visibility = View.GONE
         recentSearchLayout.visibility = View.VISIBLE
@@ -90,14 +101,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         lvSearchedWallpapers.adapter = recentSearchAdapter
     }
 
-    private fun setSearchQuery(s: String) {
-        binding.searchView.setQuery(s, false)
+    private fun setSearchQuery(query: String) {
+        binding.searchView.setQuery(query, false)
     }
 
-    private fun removeRecentSearch(s: String?) {
-        if (s != null) {
-            recentSearchAdapter.remove(s)
-            viewModel.removeItemToRecentSearchList(requireContext(), s)
+    private fun removeRecentSearch(query: String?) {
+        if (query != null) {
+            recentSearchAdapter.remove(query)
+            viewModel.removeItemToRecentSearchList(requireContext(), query)
         } else {
             recentSearchAdapter.clear()
             viewModel.clearRecentSearchList(requireContext())
@@ -114,11 +125,18 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    viewModel.addItemToRecentSearchList(requireContext(), it)
-                    viewModel.searchWallpaper(it)
+                    val recentSearch = viewModel.getRecentSearchList(requireContext())
+                    Log.d("RecentSearchList", "Search View: $recentSearch")
+                    if ((recentSearch.isEmpty() || recentSearch[0] != it) || pagingAdapter.itemCount == 0) {
+                        // If the query is new, clear and add to recent search
+                        if (recentSearch.isEmpty() || recentSearch[0] != it) {
+                            viewModel.clearSearchedWallpaper()
+                            viewModel.addItemToRecentSearchList(requireContext(), it)
+                        }
+                        viewModel.searchWallpaper(it)
+                        pb.visibility = View.VISIBLE
+                    }
                     searchView.clearFocus()
-
-                    pb.visibility = View.VISIBLE
                     rvSearchWallpapers.visibility = View.VISIBLE
                     recentSearchLayout.visibility = View.GONE
                 }
@@ -130,6 +148,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
         searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                tvNoResult.visibility = View.GONE
                 setUpRecentSearch()
             }
         }
@@ -155,23 +174,36 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.searchedWallpapers.collectLatest { pagingData ->
-                    if (pagingData != null) pagingAdapter.submitData(pagingData)
+                    pagingAdapter.submitData(pagingData)
                 }
             }
         }
         // Observe load state
         pagingAdapter.addLoadStateListener { loadState ->
-            binding.pb.visibility = if (loadState.source.refresh is LoadState.Loading) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            with(binding) {
+                when (loadState.refresh) {
+                    is LoadState.Loading -> {
+                        pb.visibility = View.VISIBLE
+                    }
+
+                    is LoadState.Error -> {
+                        pb.visibility = View.GONE
+                        tvNoResult.visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        searchView.clearFocus()
+                        pb.visibility = View.GONE
+                        tvNoResult.visibility = View.GONE
+                    }
+                }
             }
         }
     }
 
     private fun onFavClick(item: Photo) {
         viewModel.toggleFavorite(FavouriteImageDataBase(item.src.portrait)) { success ->
-            if (success) showToast("Image Added To Favourite")
+            if (success) showToast(getString(R.string.image_added_to_favourite))
         }
     }
 
@@ -188,13 +220,16 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        binding.rvSearchWallpapers.adapter = null
+        binding.lvSearchedWallpapers.adapter = null
         if (findNavController().currentDestination?.id !in listOf(
                 R.id.searchFragment, R.id.viewWallpaperFragment
             )
         ) {
+            viewModel.hasSearched = false
             viewModel.clearSearchedWallpaper()
             (requireActivity() as MainActivity).setBottomNavigationVisibility(true)
         }
+        super.onDestroyView()
     }
 }

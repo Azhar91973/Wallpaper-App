@@ -3,14 +3,11 @@ package com.example.dynamicwallpaper
 import android.content.Context
 import android.os.Parcelable
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.dynamicwallpaper.Common.SharedPrefs
-import com.example.dynamicwallpaper.Common.SharedPrefs.Companion.RECENT_SEARCH_LIST
 import com.example.dynamicwallpaper.Database.FavouriteImageDataBase
 import com.example.dynamicwallpaper.Models.Photo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,16 +27,18 @@ class WallpaperViewModel @Inject constructor(private val wallpaperRepository: Wa
     // State for selected position in RecyclerView
     var selectedPosition: Int? = null
 
+    // State for showing the recentSearched Layout
+    var hasSearched: Boolean = false
+
     // PagingData for wallpapers
     val wallpapers = wallpaperRepository.getWallpapers().cachedIn(viewModelScope)
 
     // StateFlow for searched wallpapers to ensure lifecycle awareness and better performance
-    private val _searchedWallpapers = MutableStateFlow<PagingData<Photo>?>(null)
-    val searchedWallpapers: StateFlow<PagingData<Photo>?> = _searchedWallpapers
+    private val _searchedWallpapers = MutableStateFlow<PagingData<Photo>>(PagingData.empty())
+    val searchedWallpapers: StateFlow<PagingData<Photo>> = _searchedWallpapers
 
-    // LiveData for favorite wallpapers
-    private val _favWallpapers = MutableLiveData<List<FavouriteImageDataBase>>()
-    val favWallpapers: LiveData<List<FavouriteImageDataBase>> = _favWallpapers
+    // flow for favorite wallpapers
+    val favWallpapers = wallpaperRepository.getAllFavImages()
 
     // Insert a favorite image
     fun insertFavImage(imgUrl: FavouriteImageDataBase) = viewModelScope.launch {
@@ -65,18 +64,17 @@ class WallpaperViewModel @Inject constructor(private val wallpaperRepository: Wa
 
 
     fun getRecentSearchList(context: Context): List<String> =
-        SharedPrefs(context).getListFromPreferences(RECENT_SEARCH_LIST)
+        SharedPrefs(context).getListFromPreferences()
 
 
     fun addItemToRecentSearchList(context: Context, item: String) =
-        SharedPrefs(context).addItemToPreferences(RECENT_SEARCH_LIST, item)
+        SharedPrefs(context).addItemToPreferences(item)
 
     fun removeItemToRecentSearchList(context: Context, item: String) =
-        SharedPrefs(context).removeItemFromPreferences(RECENT_SEARCH_LIST, item)
+        SharedPrefs(context).removeItemFromPreferences(item)
 
 
-    fun clearRecentSearchList(context: Context) =
-        SharedPrefs(context).clearListFromPreferences(RECENT_SEARCH_LIST)
+    fun clearRecentSearchList(context: Context) = SharedPrefs(context).clearListFromPreferences()
 
     // Delete a favorite image
     fun deleteFavImage(imgUrl: FavouriteImageDataBase) = viewModelScope.launch {
@@ -110,15 +108,9 @@ class WallpaperViewModel @Inject constructor(private val wallpaperRepository: Wa
         onResult(isPresent)
     }
 
-
-    // Fetch all favorite images
-    fun getAllFavImages() = viewModelScope.launch {
-        _favWallpapers.value = wallpaperRepository.getAllFavImages()
-    }
-
     // Search wallpapers by query
     fun searchWallpaper(query: String) = viewModelScope.launch {
-        wallpaperRepository.getWallpapers("search", query).cachedIn(viewModelScope)
+        wallpaperRepository.searchWallpapers(query).cachedIn(viewModelScope)
             .collectLatest { pagingData ->
                 _searchedWallpapers.value = pagingData
             }
@@ -126,6 +118,6 @@ class WallpaperViewModel @Inject constructor(private val wallpaperRepository: Wa
 
     // Clear searched wallpapers
     fun clearSearchedWallpaper() {
-        _searchedWallpapers.value = null
+        _searchedWallpapers.value = PagingData.empty()
     }
 }
