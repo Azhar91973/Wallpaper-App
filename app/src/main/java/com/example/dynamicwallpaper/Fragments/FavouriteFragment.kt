@@ -13,6 +13,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -43,13 +44,24 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
     private val viewModel: WallpaperViewModel by activityViewModels()
-    private lateinit var adapter: BaseAdapter<FavouriteImageDataBase>
+    // Our adapter is typed with both the data item and its binding.
+
+    @Inject
+    lateinit var sharedPrefs: SharedPrefs
+    private lateinit var adapter: BaseAdapter<FavouriteImageDataBase, WallpaperItemBinding>
     private lateinit var drawerLayout: DrawerLayout
+
+    // This flag indicates if selection mode is active.
     private var isSelected: Boolean = false
+
+    // Hold a reference to the current wallpaper list (used when deleting items)
+    private var wallpapersList: List<FavouriteImageDataBase> = emptyList()
+
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?,
     ): FragmentFavouriteBinding {
@@ -58,59 +70,97 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        handleBackPress()
         setUpDrawerLayout()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
     }
 
-    override fun setUpViews() {}
+    private fun handleBackPress() {
+        val backCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (adapter.getSelectedCount() == 0) {
+                    isEnabled = false
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                } else {
+                    adapter.clearSelections()
+                    updateDeleteButtonVisibility()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
+    }
+
+    override fun setUpViews() {
+        // Additional view setup if needed.
+    }
 
     private fun setUpWallpapers(wallpapers: List<FavouriteImageDataBase>) {
-        adapter = BaseAdapter()
-        adapter.listOfItems = wallpapers.toMutableList()
-        adapter.expressionOnCreateViewHolder = {
-            WallpaperItemBinding.inflate(layoutInflater, it, false)
+        wallpapersList = wallpapers
+        adapter = object : BaseAdapter<FavouriteImageDataBase, WallpaperItemBinding>() {
+            override fun createBinding(parent: ViewGroup): WallpaperItemBinding {
+                return WallpaperItemBinding.inflate(layoutInflater, parent, false)
+            }
+
+            override fun getItemId(item: FavouriteImageDataBase): String {
+                // Convert the id to string if necessary.
+                return item.id.toString()
+            }
+
+            override fun bindView(
+                binding: WallpaperItemBinding,
+                item: FavouriteImageDataBase,
+                isSelected: Boolean,
+            ) {
+                Glide.with(binding.root.context).load(item.imageUrl).into(binding.imgWallpaper)
+                binding.icFav.visibility = View.GONE
+                binding.selectedFav.visibility = if (isSelected) View.VISIBLE else View.GONE
+            }
+
+            override fun areItemsTheSame(
+                oldItem: FavouriteImageDataBase,
+                newItem: FavouriteImageDataBase,
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(
+                oldItem: FavouriteImageDataBase,
+                newItem: FavouriteImageDataBase,
+            ): Boolean {
+                return oldItem == newItem
+            }
         }
-        adapter.expressionViewHolderBinding = { item, viewBinding ->
-            val view = viewBinding as WallpaperItemBinding
-            val idx = adapter.listOfItems.indexOf(item)
 
-            // Bind data
-            Glide.with(requireContext()).load(item.imageUrl).into(view.imgWallpaper)
-            view.icFav.visibility = View.GONE
-
-            // Handle selection state
-            if (adapter.selectedItemList.contains(idx)) {
-                view.selectedFav.visibility = View.VISIBLE
+        // Set up click and long-click listeners using the adapter’s callbacks.
+        adapter.onItemClick = { item ->
+            // If the item is already selected or selection mode is active, toggle its selection.
+            if (adapter.isSelected(item) || isSelected) {
+                adapter.toggleSelection(adapter.getItemId(item))
+                updateDeleteButtonVisibility()
             } else {
-                view.selectedFav.visibility = View.GONE
-            }
-            // Handle click and long click listeners
-            view.imgWallpaper.setOnClickListener {
-                if (adapter.selectedItemList.contains(idx)) {
-                    toggleSelection(idx)
-                } else if (isSelected) {
-                    toggleSelection(idx)
-                } else {
-                    viewModel.selectedPosition = idx
-                    Log.d("FavPosition", "setUpWallpapers: Position = $idx")
-                    findNavController().navigate(
-                        R.id.action_favouriteFragment_to_viewWallpaperFragment,
-                        bundleOf("source" to "Favourite")
-                    )
-                }
-            }
-            view.imgWallpaper.setOnLongClickListener {
-                if (!adapter.selectedItemList.contains(idx)) {
-                    toggleSelection(idx)
-                    isSelected = true
-                    binding.btnDelete.visibility = View.VISIBLE
-                }
-                true
+                // Otherwise, treat the click as a normal item click.
+                val index = wallpapersList.indexOf(item)
+                viewModel.selectedPosition = index
+                Log.d("FavPosition", "setUpWallpapers: Position = $index")
+                findNavController().navigate(
+                    R.id.action_favouriteFragment_to_viewWallpaperFragment,
+                    bundleOf("source" to "Favourite")
+                )
             }
         }
 
+        adapter.onItemLongClick = { item ->
+            if (!adapter.isSelected(item)) {
+                adapter.toggleSelection(adapter.getItemId(item))
+                isSelected = true
+                binding.btnDelete.visibility = View.VISIBLE
+            }
+            true
+        }
+
+        adapter.submitList(wallpapers)
         binding.rvFavWallpapers.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.rvFavWallpapers.adapter = adapter
     }
@@ -131,34 +181,58 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
 
     override fun setUpClickListeners() {
         binding.btnDelete.setOnClickListener {
-            val indicesToRemove = adapter.selectedItemList.sortedDescending()
-            indicesToRemove.forEach { index ->
-                viewModel.deleteFavImage(adapter.listOfItems[index])
-                adapter.listOfItems.removeAt(index)
-                adapter.notifyItemRemoved(index)
-            }
-            isSelected = false
-            adapter.selectedItemList.clear()
-            updateDeleteButtonVisibility()
-            if (adapter.listOfItems.isEmpty()) setUpEmptyFavLayout()
+            showDeleteConfirmationDialog()
         }
         binding.option.setOnClickListener {
-            if (adapter.selectedItemList.size > 1) openDialog()
+            if (adapter.getSelectedCount() > 1) openDialog()
             else showToast(getString(R.string.play_wallpaper_info))
         }
         binding.icMenu.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
         binding.btnExplore.setOnClickListener {
-            (requireActivity() as MainActivity).onBackPressedDispatcher.onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        val dialog = Dialog(requireContext()).apply {
+            setContentView(R.layout.dialog_delete_confirmation)
+            setCancelable(true)
+        }
+        val btnConfirm = dialog.findViewById<Button>(R.id.btn_confirm)
+        val btnCancel = dialog.findViewById<Button>(R.id.btn_cancel)
+        btnConfirm.setOnClickListener {
+            deleteSelectedItems()
+            dialog.dismiss()
+        }
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun deleteSelectedItems() {
+        val selectedIds = adapter.getSelectedIds()
+        // Remove selected items from the local list.
+        val remainingItems = wallpapersList.filter { adapter.getItemId(it) !in selectedIds }
+        wallpapersList.filter { adapter.getItemId(it) in selectedIds }
+            .forEach { viewModel.deleteFavImage(it) }
+        wallpapersList = remainingItems
+        adapter.submitList(remainingItems)
+        adapter.clearSelections()
+        updateDeleteButtonVisibility()
+        if (remainingItems.isEmpty()) setUpEmptyFavLayout()
     }
 
     private fun openDialog() {
         val dialog = Dialog(requireContext()).apply {
             setContentView(R.layout.custom_dialog)
         }
-        // Initialize views
         val tvQuantity = dialog.findViewById<TextView>(R.id.tv_quantity)
         val btnIncrement = dialog.findViewById<ImageView>(R.id.btn_increment)
         val btnDecrement = dialog.findViewById<ImageView>(R.id.btn_decrement)
@@ -171,19 +245,17 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
         val setOnAutoCompleteTextView =
             setOnDropdown.findViewById<AutoCompleteTextView>(R.id.auto_complete_text)
 
-        // Dropdown options
         val durationOptions = listOf(
-            getString(R.string.minutes), getString(R.string.hours), getString(
-                R.string.days
-            )
+            getString(R.string.minutes), getString(R.string.hours), getString(R.string.days)
         )
         val setOnOptions = listOf(
             getString(R.string.homescreen), getString(R.string.lockscreen), getString(R.string.both)
         )
 
-        // Helper function to setup dropdown
         fun setupDropdown(
-            view: AutoCompleteTextView, options: List<String>, defaultOption: String,
+            view: AutoCompleteTextView,
+            options: List<String>,
+            defaultOption: String,
         ) {
             view.setAdapter(
                 ArrayAdapter(
@@ -193,15 +265,11 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             view.setText(defaultOption, false)
         }
 
-        // Initialize quantity
         var quantity = 15
         tvQuantity.text = quantity.toString()
-
-        // Setup dropdowns
         setupDropdown(durationAutoCompleteTextView, durationOptions, durationOptions[0])
         setupDropdown(setOnAutoCompleteTextView, setOnOptions, setOnOptions[0])
 
-        // Update quantity when duration changes
         durationAutoCompleteTextView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -212,7 +280,6 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             }
         })
 
-        // Increment/Decrement logic
         btnIncrement.setOnClickListener {
             quantity++
             tvQuantity.text = quantity.toString()
@@ -226,7 +293,6 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             }
         }
 
-        // Submit button click listener
         submitButton.setOnClickListener {
             val selectedDuration = durationAutoCompleteTextView.text.toString()
             val selectedSetOn = setOnAutoCompleteTextView.text.toString()
@@ -245,7 +311,6 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             scheduleWork(quantity, timeUnit, setType)
             dialog.dismiss()
         }
-        // Show dialog with adjusted size
         dialog.show()
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
@@ -254,16 +319,14 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
     }
 
     private fun scheduleWork(quantity: Int, duration: TimeUnit, wallpaperSetType: Int) {
-        // Prepare the list of selected wallpaper IDs
-        val selectedWallpaperIds = adapter.selectedItemList.map { adapter.listOfItems[it].id }
-        // Reset previous selections and configurations
+        val selectedWallpaperIds = adapter.getSelectedIds().map { it.toInt() }
+        Log.d("SelectedIds", "scheduleWork: $selectedWallpaperIds")
         viewModel.resetSelectedWallpapers()
-        val prefs = SharedPrefs(requireContext())
+        val prefs = sharedPrefs
         prefs.saveInt(0)
         prefs.saveWallpaperSetType(wallpaperSetType)
         WorkManager.getInstance(requireContext()).cancelAllWork()
         viewModel.markSelectedImages(selectedWallpaperIds)
-        // Start the periodic worker request
         val periodicWorkRequest =
             PeriodicWorkRequest.Builder(WallpaperWorker::class.java, quantity.toLong(), duration)
                 .build()
@@ -271,18 +334,8 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
         showToast(getString(R.string.wallpaper_change_scheduled))
     }
 
-    private fun toggleSelection(position: Int) {
-        if (adapter.selectedItemList.contains(position)) {
-            adapter.selectedItemList.remove(position)
-        } else {
-            adapter.selectedItemList.add(position)
-        }
-        adapter.notifyItemChanged(position) // Ensure the specific item is updated
-        updateDeleteButtonVisibility()
-    }
-
     private fun updateDeleteButtonVisibility() {
-        if (adapter.selectedItemList.isEmpty()) {
+        if (adapter.getSelectedCount() == 0) {
             binding.btnDelete.visibility = View.GONE
             isSelected = false
         } else {
@@ -295,7 +348,7 @@ class FavouriteFragment : BaseFragment<FragmentFavouriteBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.favWallpapers.collectLatest { favWallpaperList ->
                     setUpWallpapers(favWallpaperList)
-                    if (adapter.listOfItems.size == 0) setUpEmptyFavLayout()
+                    if (favWallpaperList.isEmpty()) setUpEmptyFavLayout()
                 }
             }
         }

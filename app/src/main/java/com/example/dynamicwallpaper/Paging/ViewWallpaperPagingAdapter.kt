@@ -12,8 +12,7 @@ import com.example.dynamicwallpaper.databinding.SetWallpaperItemBinding
 class ViewWallpaperPagingAdapter(
     private val setWallpaper: (String) -> Unit,
     private val favImage: (Photo) -> Unit,
-    private val downloadImage: (String) -> Unit,
-    private val backBtnClicked: () -> Unit
+    private val downloadImage: (Photo) -> Unit,
 ) : PagingDataAdapter<Photo, ViewWallpaperPagingAdapter.ViewWallpaperViewHolder>(COMPARATOR) {
 
     inner class ViewWallpaperViewHolder(private val binding: SetWallpaperItemBinding) :
@@ -22,9 +21,8 @@ class ViewWallpaperPagingAdapter(
         fun bind(item: Photo) {
             Glide.with(binding.root.context).load(item.src.portrait).into(binding.viewWallpaper)
             binding.imgAddFavourite.setOnClickListener { favImage(item) }
-            binding.imgShare.setOnClickListener { downloadImage(item.src.portrait) }
+            binding.imgDownload.setOnClickListener { downloadImage(item) }
             binding.imgSetWallpaper.setOnClickListener { setWallpaper(item.src.portrait) }
-            binding.imgBackBtn.setOnClickListener { backBtnClicked() }
         }
     }
 

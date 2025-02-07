@@ -1,6 +1,5 @@
 package com.example.dynamicwallpaper
 
-import android.content.Context
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -18,8 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WallpaperViewModel @Inject constructor(private val wallpaperRepository: WallpaperRepository) :
-    ViewModel() {
+class WallpaperViewModel @Inject constructor(
+    private val wallpaperRepository: WallpaperRepository,
+    private val sharedPrefs: SharedPrefs,
+) : ViewModel() {
 
     // State for recycler view scroll position
     var recyclerViewState: Parcelable? = null
@@ -63,18 +64,15 @@ class WallpaperViewModel @Inject constructor(private val wallpaperRepository: Wa
         }
 
 
-    fun getRecentSearchList(context: Context): List<String> =
-        SharedPrefs(context).getListFromPreferences()
+    fun getRecentSearchList(): List<String> = sharedPrefs.getListFromPreferences()
 
 
-    fun addItemToRecentSearchList(context: Context, item: String) =
-        SharedPrefs(context).addItemToPreferences(item)
+    fun addItemToRecentSearchList(item: String) = sharedPrefs.addItemToPreferences(item)
 
-    fun removeItemToRecentSearchList(context: Context, item: String) =
-        SharedPrefs(context).removeItemFromPreferences(item)
+    fun removeItemToRecentSearchList(item: String) = sharedPrefs.removeItemFromPreferences(item)
 
 
-    fun clearRecentSearchList(context: Context) = SharedPrefs(context).clearListFromPreferences()
+    fun clearRecentSearchList() = sharedPrefs.clearListFromPreferences()
 
     // Delete a favorite image
     fun deleteFavImage(imgUrl: FavouriteImageDataBase) = viewModelScope.launch {

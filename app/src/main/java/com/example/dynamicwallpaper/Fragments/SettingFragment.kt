@@ -14,10 +14,13 @@ import com.example.dynamicwallpaper.Common.SharedPrefs.Companion.THEME_LIGHT
 import com.example.dynamicwallpaper.MainActivity
 import com.example.dynamicwallpaper.Utils.ThemeManager
 import com.example.dynamicwallpaper.databinding.FragmentSettingBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
-    private lateinit var prefs: SharedPrefs
+    @Inject
+    lateinit var prefs: SharedPrefs
     private val appTheme get() = prefs.getThemePreference()
 
     override fun inflateBinding(
@@ -28,7 +31,6 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        prefs = SharedPrefs(requireContext())
         setUpViews()
         setUpClickListeners()
         setUpObservers()

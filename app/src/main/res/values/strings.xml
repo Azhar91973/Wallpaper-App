@@ -6,7 +6,6 @@
     <string name="setting">Setting</string>
     <string name="find_wallpaper">Find Wallpaper..</string>
     <string name="img">Img</string>
-    <string name="share">Share</string>
     <string name="set">SET</string>
     <string name="favorite">Favourite</string>
     <string name="main_recyclerview">Main RecyclerView</string>
@@ -22,6 +21,7 @@
     <string name="decrement">Decrement</string>
     <string name="increment">Increment</string>
     <string name="change_your_wallpaper_every">Change Your Wallpaper Every</string>
+    <string name="confirm_delete">Confirm Delete</string>
     <string name="please_check_your_internet_connection">Please Check Your Internet Connection.</string>
     <string name="retry">Retry</string>
     <string name="theme_text">Switch To Dark Mode</string>
@@ -44,5 +44,11 @@
     <string name="image_url_is_invalid">Image URL is invalid.</string>
     <string name="wallpaper_set_successfully">Wallpaper Set Successfully</string>
     <string name="failed_to_set_wallpaper">Failed to set wallpaper</string>
+    <string name="delete_info">Are you sure you want to delete selected wallpapers?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="download_started">Download started…</string>
+    <string name="download_failed">Download failed: %1$s</string>
+    <string name="download">Download</string>
 
 </resources>

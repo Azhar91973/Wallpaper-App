@@ -1,6 +1,5 @@
 package com.example.dynamicwallpaper
 
-import androidx.lifecycle.LiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -13,12 +12,10 @@ import com.example.dynamicwallpaper.Paging.WallpaperPagingSource
 import com.example.dynamicwallpaper.Utils.Constants.MAX_SIZE
 import com.example.dynamicwallpaper.Utils.Constants.PER_PAGE_ITEMS
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class WallpaperRepository @Inject constructor(
-    private val wallpaperApi: WallpaperApi, private val favImageDao: Dao
+    private val wallpaperApi: WallpaperApi, private val favImageDao: Dao,
 ) {
 
     /**
@@ -26,20 +23,17 @@ class WallpaperRepository @Inject constructor(
      */
     fun getWallpapers(): Flow<PagingData<Photo>> {
         return Pager(config = PagingConfig(
-            pageSize = PER_PAGE_ITEMS,
-            maxSize = MAX_SIZE,
-            enablePlaceholders = false
+            pageSize = PER_PAGE_ITEMS, maxSize = MAX_SIZE, enablePlaceholders = false
         ), pagingSourceFactory = {
             WallpaperPagingSource(wallpaperApi)
         }).flow
     }
+
     fun searchWallpapers(query: String): Flow<PagingData<Photo>> {
         return Pager(config = PagingConfig(
-            pageSize = PER_PAGE_ITEMS,
-            maxSize = MAX_SIZE,
-            enablePlaceholders = false
+            pageSize = PER_PAGE_ITEMS, maxSize = MAX_SIZE, enablePlaceholders = false
         ), pagingSourceFactory = {
-            SearchWallpapersPagingSource(wallpaperApi,query)
+            SearchWallpapersPagingSource(wallpaperApi, query)
         }).flow
     }
 

@@ -13,6 +13,7 @@ import com.example.dynamicwallpaper.Utils.ThemeManager
 import com.example.dynamicwallpaper.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * MainActivity is the host activity for the DynamicWallpaper application.
@@ -38,7 +39,8 @@ class MainActivity : AppCompatActivity() {
     private var currentNavPosition: Int = 0
 
     // Shared preferences helper to store/retrieve app settings.
-    private lateinit var prefs: SharedPrefs
+    @Inject
+    lateinit var prefs: SharedPrefs
 
     // Drawer layout and navigation view for the side navigation menu.
     lateinit var drawerLayout: DrawerLayout
@@ -58,8 +60,6 @@ class MainActivity : AppCompatActivity() {
      * - Setup navigation components and handle back button presses.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Initialize SharedPrefs before setting theme
-        prefs = SharedPrefs(this)
 
         // Set the default theme before creating the view hierarchy.
         setTheme(R.style.Theme_DynamicWallpaper)
@@ -170,10 +170,12 @@ class MainActivity : AppCompatActivity() {
                         // If on HomeFragment, finish the activity.
                         finish()
                     }
+
                     R.id.viewWallpaperFragment, R.id.searchFragment -> {
                         // Pop the back stack to return to the previous fragment.
                         navController.popBackStack()
                     }
+
                     else -> {
                         // For all other destinations, navigate back to HomeFragment.
                         navigateToDestination(R.id.HomeFragment)
@@ -190,12 +192,8 @@ class MainActivity : AppCompatActivity() {
      * @return NavOptions configured with enter and exit animations.
      */
     private fun createNavOptions(): NavOptions {
-        return NavOptions.Builder()
-            .setEnterAnim(R.anim.fade_in)
-            .setExitAnim(R.anim.fade_out)
-            .setPopEnterAnim(R.anim.fade_in)
-            .setPopExitAnim(R.anim.fade_out)
-            .build()
+        return NavOptions.Builder().setEnterAnim(R.anim.fade_in).setExitAnim(R.anim.fade_out)
+            .setPopEnterAnim(R.anim.fade_in).setPopExitAnim(R.anim.fade_out).build()
     }
 
     /**

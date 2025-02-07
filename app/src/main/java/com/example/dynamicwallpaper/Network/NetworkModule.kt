@@ -1,10 +1,13 @@
 package com.example.dynamicwallpaper.Network
 
+import android.content.Context
 import com.example.dynamicwallpaper.BuildConfig
+import com.example.dynamicwallpaper.Common.SharedPrefs
 import com.example.dynamicwallpaper.Utils.ApiRoutes.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,6 +22,8 @@ object NetworkModule {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
         else HttpLoggingInterceptor.Level.NONE
     }
+
+    //    Provides object of OkkHttpClient
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -30,6 +35,7 @@ object NetworkModule {
         }.build()
     }
 
+    //    Provides object of Retrofit
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -37,9 +43,17 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build()
     }
 
+    //    Provides object of Wallpaper API
     @Provides
     @Singleton
     fun provideWallpaperApi(retrofit: Retrofit): WallpaperApi {
         return retrofit.create(WallpaperApi::class.java)
+    }
+
+    // Provides object of SharedPreference Manager
+    @Provides
+    @Singleton
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPrefs {
+        return SharedPrefs(context)
     }
 }

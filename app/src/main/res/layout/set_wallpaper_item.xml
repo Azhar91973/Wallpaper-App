@@ -15,19 +15,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/img_back_btn"
-        android:layout_width="35dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/btn_bg"
-        android:contentDescription="@string/img"
-        android:src="@drawable/ic_back_btn_white"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="wrap_content"
@@ -38,14 +25,14 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
-            android:id="@+id/img_share"
+            android:id="@+id/img_download"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/btn_bg"
             android:contentDescription="@string/img"
             android:padding="10dp"
-            android:src="@drawable/ic_share"
+            android:src="@drawable/ic_download"
             app:layout_constraintEnd_toStartOf="@+id/img_set_wallpaper"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -59,13 +46,13 @@
             android:gravity="center"
             android:paddingHorizontal="10dp"
             android:paddingVertical="2dp"
-            android:text="@string/share"
+            android:text="@string/download"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@+id/img_share"
-            app:layout_constraintStart_toStartOf="@+id/img_share"
-            app:layout_constraintTop_toBottomOf="@+id/img_share" />
+            app:layout_constraintEnd_toEndOf="@+id/img_download"
+            app:layout_constraintStart_toStartOf="@+id/img_download"
+            app:layout_constraintTop_toBottomOf="@+id/img_download" />
 
         <ImageView
             android:id="@+id/img_set_wallpaper"
@@ -78,7 +65,7 @@
             android:padding="10dp"
             android:src="@drawable/ic_paint"
             app:layout_constraintEnd_toStartOf="@+id/img_add_favourite"
-            app:layout_constraintStart_toEndOf="@+id/img_share"
+            app:layout_constraintStart_toEndOf="@+id/img_download"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

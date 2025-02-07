@@ -94,24 +94,47 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
             )
         )
 
-        val cAdapter = BaseAdapter<CategoryItems>()
-        cAdapter.listOfItems = items.toMutableList()
-        cAdapter.expressionOnCreateViewHolder = {
-            CategoryItemBinding.inflate(layoutInflater, it, false)
-        }
-        cAdapter.expressionViewHolderBinding = { item, viewBinding ->
-            val view = viewBinding as CategoryItemBinding
-            Glide.with(requireContext()).load(item.categoryImgUrl).into(view.imgCategory)
-            view.tvCategory.text = item.categoryName
-            view.imgCategory.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_categoryFragment_to_searchFragment,
-                    bundleOf("query" to item.categoryName, "flag" to true)
-                )
+        val cAdapter = object : BaseAdapter<CategoryItems, CategoryItemBinding>() {
+            override fun createBinding(parent: ViewGroup): CategoryItemBinding {
+                return CategoryItemBinding.inflate(layoutInflater, parent, false)
+            }
+
+            override fun getItemId(item: CategoryItems): String {
+                // Use the category name as a unique identifier.
+                return item.categoryName
+            }
+
+            override fun bindView(
+                binding: CategoryItemBinding,
+                item: CategoryItems,
+                isSelected: Boolean,
+            ) {
+                Glide.with(requireContext()).load(item.categoryImgUrl).into(binding.imgCategory)
+                binding.tvCategory.text = item.categoryName
+                binding.imgCategory.setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_categoryFragment_to_searchFragment,
+                        bundleOf("query" to item.categoryName, "flag" to true)
+                    )
+                }
+            }
+
+            override fun areItemsTheSame(oldItem: CategoryItems, newItem: CategoryItems): Boolean {
+                // Compare using the unique identifier.
+                return oldItem.categoryName == newItem.categoryName
+            }
+
+            override fun areContentsTheSame(
+                oldItem: CategoryItems,
+                newItem: CategoryItems,
+            ): Boolean {
+                return oldItem == newItem
             }
         }
+
         binding.rvCategoryItems.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvCategoryItems.adapter = cAdapter
+        cAdapter.submitList(items)
     }
 
     private fun setUpDrawerLayout() {

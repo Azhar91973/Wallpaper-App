@@ -90,7 +90,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     }
 
     private fun setUpRecentSearch() = with(binding) {
-        val recentSearch = viewModel.getRecentSearchList(requireContext())
+        val recentSearch = viewModel.getRecentSearchList()
         Log.d("RecentSearchList", "setUpRecentSearch: $recentSearch")
         if (recentSearch.isEmpty()) return
         rvSearchWallpapers.visibility = View.GONE
@@ -108,15 +108,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     private fun removeRecentSearch(query: String?) {
         if (query != null) {
             recentSearchAdapter.remove(query)
-            viewModel.removeItemToRecentSearchList(requireContext(), query)
+            viewModel.removeItemToRecentSearchList(query)
         } else {
             recentSearchAdapter.clear()
-            viewModel.clearRecentSearchList(requireContext())
+            viewModel.clearRecentSearchList()
         }
         recentSearchAdapter.notifyDataSetChanged()
-        if (viewModel.getRecentSearchList(requireContext())
-                .isEmpty()
-        ) binding.recentSearchLayout.visibility = View.GONE
+        if (viewModel.getRecentSearchList().isEmpty()) binding.recentSearchLayout.visibility =
+            View.GONE
     }
 
     override fun setUpClickListeners() = with(binding) {
@@ -125,13 +124,13 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    val recentSearch = viewModel.getRecentSearchList(requireContext())
+                    val recentSearch = viewModel.getRecentSearchList()
                     Log.d("RecentSearchList", "Search View: $recentSearch")
                     if ((recentSearch.isEmpty() || recentSearch[0] != it) || pagingAdapter.itemCount == 0) {
                         // If the query is new, clear and add to recent search
                         if (recentSearch.isEmpty() || recentSearch[0] != it) {
                             viewModel.clearSearchedWallpaper()
-                            viewModel.addItemToRecentSearchList(requireContext(), it)
+                            viewModel.addItemToRecentSearchList(it)
                         }
                         viewModel.searchWallpaper(it)
                         pb.visibility = View.VISIBLE

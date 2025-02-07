@@ -1,7 +1,10 @@
 package com.example.dynamicwallpaper.WallpaperService
 
+import android.app.DownloadManager
 import android.app.WallpaperManager
 import android.content.Context
+import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.dynamicwallpaper.R
@@ -45,7 +48,38 @@ class WallpaperHelper(private val context: Context) {
     }
 
     // Helper method to download the wallpaper image (this could be any logic you want)
-    fun downloadWallpaperWithNotification() {}
+    fun downloadWallpaper(context: Context, imageUrl: String, fileName: String) {
+        try {
+            val folderName = context.getString(R.string.app_name)
+            val filePath = "${Environment.DIRECTORY_PICTURES}/$folderName"
+            val directory = Environment.getExternalStoragePublicDirectory(filePath)
+            if (!directory.exists()) {
+                directory.mkdirs() // Create the folder if it doesn't exist
+            }
+
+            val request =
+                DownloadManager.Request(Uri.parse(imageUrl)).setTitle("Downloading Wallpaper")
+                    .setDescription("Downloading $fileName")
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    .setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_PICTURES,
+                        "$folderName/$fileName.jpg" // Store inside app-specific folder
+                    )
+
+
+            val downloadManager =
+                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+
+            Toast.makeText(
+                context, context.getString(R.string.download_started), Toast.LENGTH_SHORT
+            ).show()
+        } catch (e: Exception) {
+            Toast.makeText(
+                context, context.getString(R.string.download_failed, e.message), Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     companion object {
         const val HOME_SCREEN = 0

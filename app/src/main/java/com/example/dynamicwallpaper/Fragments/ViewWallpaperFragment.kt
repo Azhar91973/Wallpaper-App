@@ -32,15 +32,19 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
 
     private lateinit var pagingAdapter: ViewWallpaperPagingAdapter
-    private lateinit var favAdapter: BaseAdapter<FavouriteImageDataBase>
+    private lateinit var favAdapter: BaseAdapter<FavouriteImageDataBase, SetWallpaperItemBinding>
     private val wallpaperViewModel: WallpaperViewModel by activityViewModels()
     private lateinit var source: String
     private var isDarkMode: Boolean = false
+
+    @Inject
+    lateinit var sharedPrefs: SharedPrefs
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +55,7 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagingAdapter = ViewWallpaperPagingAdapter(
-            ::setWallpaper, ::favImage, ::downloadImage, ::backBtnClicked
+            ::setWallpaper, ::favImage, ::downloadImage
         )
     }
 
@@ -61,6 +65,7 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
         (requireActivity() as MainActivity).setBottomNavigationVisibility(false)
         source = arguments?.getString(ARG_SOURCE) ?: "home"
         setUpViews()
+        setUpClickListeners()
         setUpObservers()
     }
 
@@ -76,12 +81,15 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
         }
     }
 
-
     override fun setUpViews() {
         binding.vpViewWallpaper.adapter = pagingAdapter
     }
 
-    override fun setUpClickListeners() {}
+    override fun setUpClickListeners() {
+        binding.imgBackBtn.setOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
 
     override fun setUpObservers() {
         lifecycleScope.launch {
@@ -108,9 +116,11 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
         }
     }
 
-    private fun downloadImage(imageUrl: String) {
+    private fun downloadImage(item: Photo) {
         lifecycleScope.launch {
-            WallpaperHelper(requireContext()).downloadWallpaperWithNotification()
+            WallpaperHelper(requireContext()).downloadWallpaper(
+                requireContext(), item.src.portrait, item.id.toString()
+            )
         }
     }
 
@@ -121,10 +131,6 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
         MyBottomSheetFragment.newInstance(imageUrl).show(
             requireActivity().supportFragmentManager, "BottomSheet"
         )
-    }
-
-    private fun backBtnClicked() {
-        findNavController().navigateUp()
     }
 
     private fun collectWallpapers(flow: Flow<PagingData<Photo>?>) {
@@ -146,24 +152,46 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
     }
 
     private fun showFavImages(favList: List<FavouriteImageDataBase>) {
-        favAdapter = BaseAdapter<FavouriteImageDataBase>().apply {
-            listOfItems = favList.toMutableList()
-            expressionOnCreateViewHolder = {
-                SetWallpaperItemBinding.inflate(layoutInflater, it, false)
+        favAdapter = object : BaseAdapter<FavouriteImageDataBase, SetWallpaperItemBinding>() {
+            override fun createBinding(parent: ViewGroup): SetWallpaperItemBinding {
+                return SetWallpaperItemBinding.inflate(layoutInflater, parent, false)
             }
-            expressionViewHolderBinding = { item, viewBinding ->
-                (viewBinding as SetWallpaperItemBinding).apply {
-                    constraintLayout.visibility = View.GONE
-                    Glide.with(requireContext()).load(item.imageUrl).into(viewWallpaper)
-                    imgBackBtn.setOnClickListener { backBtnClicked() }
-                }
+
+            override fun getItemId(item: FavouriteImageDataBase): String {
+                // Convert the item's id to String (adjust as needed)
+                return item.id.toString()
+            }
+
+            override fun bindView(
+                binding: SetWallpaperItemBinding,
+                item: FavouriteImageDataBase,
+                isSelected: Boolean,
+            ) {
+                // Set the view properties (isSelected not used in this case)
+                binding.constraintLayout.visibility = View.GONE
+                Glide.with(requireContext()).load(item.imageUrl).into(binding.viewWallpaper)
+            }
+
+            override fun areItemsTheSame(
+                oldItem: FavouriteImageDataBase,
+                newItem: FavouriteImageDataBase,
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(
+                oldItem: FavouriteImageDataBase,
+                newItem: FavouriteImageDataBase,
+            ): Boolean {
+                return oldItem == newItem
             }
         }
+
+        favAdapter.submitList(favList)
         binding.vpViewWallpaper.adapter = favAdapter
-        binding.vpViewWallpaper.setCurrentItem(
-            wallpaperViewModel.selectedPosition ?: 0, false
-        )
+        binding.vpViewWallpaper.setCurrentItem(wallpaperViewModel.selectedPosition ?: 0, false)
     }
+
 
     override fun onPause() {
         super.onPause()
@@ -172,7 +200,7 @@ class ViewWallpaperFragment : BaseFragment<FragmentViewWallpapperBinding>() {
 
     override fun onResume() {
         super.onResume()
-        isDarkMode = SharedPrefs(requireContext()).getThemePreference() == THEME_DARK
+        isDarkMode = sharedPrefs.getThemePreference() == THEME_DARK
         val position = wallpaperViewModel.selectedPosition ?: 0
         Log.d("WallpaperPosition", "onResume: $position")
         binding.vpViewWallpaper.setCurrentItem(position, false)

@@ -34,14 +34,19 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
+    // Shared ViewModel instance
     private val viewModel: WallpaperViewModel by activityViewModels()
+
+    // Adapter for paging and displaying wallpapers
     private lateinit var pagingAdapter: WallpaperPagingAdapter
-    private var lastSwipeTime = 0L
+
+    // Navigation drawer layout
     private lateinit var drawerLayout: DrawerLayout
 
     companion object {
-        const val NAVIGATION_SOURCE = "source"
+        private const val NAVIGATION_SOURCE = "source"
         private const val SWIPE_DEBOUNCE_TIME = 300L
+        private const val GRID_SPAN_COUNT = 3
     }
 
     override fun inflateBinding(
@@ -52,16 +57,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpDrawerLayout()
+
+        // Setup UI components
+        setupDrawerLayout()
         setUpViews()
         setUpClickListeners()
         setUpObservers()
         observeLoadState()
     }
 
-    private fun setUpDrawerLayout() {
+    /**
+     * Configures the navigation drawer layout and handles menu item clicks.
+     */
+    private fun setupDrawerLayout() {
         drawerLayout = (requireActivity() as MainActivity).drawerLayout
         val navigationView: NavigationView = (requireActivity() as MainActivity).navigationView
+
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.drawer_setting -> {
@@ -73,48 +84,62 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-
+    /**
+     * Initializes RecyclerView with a GridLayoutManager and attaches the paging adapter.
+     */
     override fun setUpViews() {
         pagingAdapter = WallpaperPagingAdapter(::onItemClicked, ::onFavClick)
+
         binding.rvWallpapers.apply {
-            layoutManager = GridLayoutManager(requireContext(), 3).apply {
-                initialPrefetchItemCount = 6
-            }
+            layoutManager = GridLayoutManager(requireContext(), GRID_SPAN_COUNT)
             setHasFixedSize(true)
             adapter =
                 pagingAdapter.withLoadStateFooter(CustomLoadStateAdapter { pagingAdapter.retry() })
         }
 
-        detectSwipe()
+        handleRecyclerViewScroll()
     }
 
-    private fun detectSwipe() {
+    /**
+     * Handles RecyclerView scroll events to hide/show the bottom navigation bar.
+     */
+    private fun handleRecyclerViewScroll() {
         binding.rvWallpapers.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            private var lastSwipeTime = 0L
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (System.currentTimeMillis() - lastSwipeTime > SWIPE_DEBOUNCE_TIME) {
                     lastSwipeTime = System.currentTimeMillis()
-                    if (dy > 0) setBottomNavigationVisibility(false)
-                    else if (dy < 0) setBottomNavigationVisibility(true)
+                    setBottomNavigationVisibility(dy < 0)
                 }
             }
         })
     }
 
+    /**
+     * Shows or hides the bottom navigation bar based on scroll direction.
+     */
     private fun setBottomNavigationVisibility(isVisible: Boolean) {
         (requireActivity() as? MainActivity)?.setBottomNavigationVisibility(isVisible)
     }
 
+    /**
+     * Sets up click listeners for UI elements such as the search bar and menu button.
+     */
     override fun setUpClickListeners() {
         binding.sv.setOnClickListener {
             findNavController().navigate(R.id.action_HomeFragment_to_searchFragment)
         }
+
         binding.icMenu.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
     }
 
-
+    /**
+     * Observes the wallpaper data from ViewModel and submits it to the adapter.
+     */
     override fun setUpObservers() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -125,6 +150,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    /**
+     * Observes the adapter's load state and updates UI accordingly.
+     */
     private fun observeLoadState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -135,6 +163,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    /**
+     * Handles different states of data loading (loading, error, success).
+     */
     private fun handleLoadState(loadState: CombinedLoadStates) {
         val isListEmpty =
             loadState.source.refresh is LoadState.NotLoading && pagingAdapter.itemCount == 0
@@ -152,11 +183,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             binding.loadStateLayout.addView(loadStateView)
             bindLoadStateView(loadStateView, loadState.refresh)
         } else {
-            val loadStateView = binding.loadStateLayout.getChildAt(0)
-            bindLoadStateView(loadStateView, loadState.refresh)
+            bindLoadStateView(binding.loadStateLayout.getChildAt(0), loadState.refresh)
         }
     }
 
+    /**
+     * Configures the load state view (retry button, progress bar, error message).
+     */
     private fun bindLoadStateView(loadStateView: View, loadState: LoadState) {
         val retryButton: View = loadStateView.findViewById(R.id.retry_button)
         val progressBar: View = loadStateView.findViewById(R.id.progress_bar)
@@ -169,6 +202,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         retryButton.visibility = if (loadState is LoadState.Error) View.VISIBLE else View.GONE
     }
 
+    /**
+     * Handles the favorite button click to add/remove images from favorites.
+     */
     private fun onFavClick(item: Photo) {
         viewModel.getImageByUrl(item.src.portrait) { isPresent ->
             if (!isPresent) {
@@ -180,6 +216,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    /**
+     * Handles wallpaper item click and navigates to the ViewWallpaperFragment.
+     */
     private fun onItemClicked(position: Int) {
         Log.d("HomeFragment", "Selected Position: $position")
         viewModel.selectedPosition = position
