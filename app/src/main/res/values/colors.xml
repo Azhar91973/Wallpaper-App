@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="splash_color">#29323B</color>
+    <color name="primary_color">#29323B</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey">#F0F0F0</color>
+    <color name="light_grey">#D3D3D3</color>
+    <color name="itemActive">#A8A8A8</color>
+    <color name="indicatorColor">#F0F0F0</color>
+    <color name="btnBg">#80191E31</color>
+    <color name="fade">#77000000</color>
+
+
+
+    <!-- Primary Colors -->
+    <color name="primary">#29323B</color>
+    <color name="primary_dark">#1e252d</color>
+    <color name="primary_light">#3d4754</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_blue_gray">#3d4f6d</color>
+    <color name="gradient_purple_gray">#525a7f</color>
+    <color name="gradient_cyan_gray">#3d5f7d</color>
+
+    <!-- Background Colors -->
+    <color name="background_gradient_start">#29323B</color>
+    <color name="background_gradient_middle">#1e3a5f</color>
+    <color name="background_gradient_end">#2d4a6b</color>
+
+    <!-- Screen Backgrounds -->
+    <color name="screen_bg_light">#F8FAFC</color>
+    <color name="screen_bg_blue_tint">#F0F9FF</color>
+    <color name="screen_bg_purple_tint">#FAF5FF</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_tertiary">#9CA3AF</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Input Colors -->
+    <color name="input_border">#E5E7EB</color>
+    <color name="input_background">#FFFFFF</color>
+    <color name="input_icon">#99000000</color> <!-- 60% opacity of black -->
+    <color name="input_icon_focused">#29323B</color>
+
+    <!-- Info Box -->
+    <color name="info_box_bg">#EFF6FF</color>
+    <color name="info_box_border">#BFDBFE</color>
+
+    <!-- Blur Circle Colors (with transparency) -->
+    <color name="blur_blue">#1A3B82F6</color>
+    <color name="blur_purple">#1AA855F7</color>
+    <color name="blur_cyan">#1A06B6D4</color>
+
+
+
+    <!-- Profile Screen Colors -->
+    <color name="blue_icon">#2563EB</color>        <!-- Blue for Notifications -->
+    <color name="purple_icon">#9333EA</color>      <!-- Purple for Privacy -->
+    <color name="orange_icon">#EA580C</color>      <!-- Orange for Password -->
+    <color name="green_icon">#059669</color>       <!-- Green for Language -->
+    <color name="indigo_icon">#4F46E5</color>      <!-- Indigo for Help -->
+
+    <!-- Icon Background Colors -->
+    <color name="blue_bg">#1A2563EB</color>        <!-- Blue background 10% -->
+    <color name="purple_bg">#1A9333EA</color>      <!-- Purple background 10% -->
+    <color name="orange_bg">#1AEA580C</color>      <!-- Orange background 10% -->
+    <color name="green_bg">#1A059669</color>       <!-- Green background 10% -->
+    <color name="indigo_bg">#1A4F46E5</color>      <!-- Indigo background 10% -->
+
+    <!-- Logout Button -->
+    <color name="red_start">#EF4444</color>        <!-- Red gradient start -->
+    <color name="red_mid">#DC2626</color>          <!-- Red gradient middle -->
+    <color name="red_end">#EF4444</color>          <!-- Red gradient end -->
+    <color name="red_shadow">#4DEF4444</color>     <!-- Red shadow 30% -->
+
+
+
+
+
+
+
+
+
+
+
+    // temp
+    <!-- Divider (Dark Theme) -->
+    <color name="divider">#333333</color>                 <!-- Dark divider -->
+
+    <!-- Ripple Effect (Dark Theme) -->
+    <color name="ripple">#33FFFFFF</color>                <!-- White 20% ripple -->
+
+    <!-- Account Item Background (Dark Theme) -->
+    <color name="account_item_bg">#1E1F22</color>
+
+    <!-- Decorative Background Gradient (Dark Theme) -->
+    <color name="bg_gradient_start">#0A0E12</color>       <!-- Very dark blue -->
+    <color name="bg_gradient_mid">#0F1419</color>         <!-- Dark blue-gray -->
+    <color name="bg_gradient_end">#121820</color>         <!-- Dark slate -->
+
+    <!-- Profile Header (Dark Theme) -->
+    <color name="profile_header_start">#1a1f26</color>    <!-- Darker primary -->
+    <color name="profile_header_mid">#29323B</color>      <!-- Primary -->
+    <color name="profile_header_end">#1a1f26</color>      <!-- Darker primary -->
+
+    <!-- Icon Backgrounds (Dark Theme) -->
+    <color name="icon_container_bg">#1A29323B</color>     <!-- 10% primary -->
+
+
+    <color name="card_background">#CC1E1E1E</color>       <!-- 80% opacity dark card -->
+    <color name="input_border_focused">#29323B</color>    <!-- Focused input border -->
+    <color name="text_hint">#808080</color>               <!-- Hint/disabled text -->
+
+    <color name="background">#121212</color>              <!-- Main background -->
+    <color name="surface">#1E1E1E</color>                 <!-- Surface/Card background -->
+    <color name="surface_variant">#2C2C2C</color>
+</resources>

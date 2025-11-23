@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Envelope rectangle -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M4,6 C4,4.895 4.895,4 6,4 L18,4 C19.105,4 20,4.895 20,6 L20,18 C20,19.105 19.105,20 18,20 L6,20 C4.895,20 4,19.105 4,18 Z"
+        android:strokeWidth="2"
+        android:strokeColor="@color/primary_color"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Mail flap -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M22,7 L13.03,12.7 C12.4,13.1 11.6,13.1 10.97,12.7 L2,7"
+        android:strokeWidth="2"
+        android:strokeColor="@color/primary_color"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

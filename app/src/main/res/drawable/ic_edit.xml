@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!--  Edit pencil path  -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M21.174,6.812 C21.5557,6.43028 21.7701,5.90929 21.7701,5.3655 C21.7701,4.82171 21.5557,4.30072 21.174,3.919 C20.7923,3.53728 20.2713,3.32289 19.7275,3.32289 C19.1837,3.32289 18.6627,3.53728 18.281,3.919 L3.842,18.174 C3.54983,18.4656 3.33732,18.8281 3.227,19.227 L1.906,23.579 C1.85989,23.7294 1.85617,23.8896 1.89529,24.0419 C1.93441,24.1943 2.01479,24.3326 2.12736,24.4415 C2.23993,24.5504 2.38027,24.6258 2.53311,24.6595 C2.68596,24.6931 2.84547,24.684 2.993,24.633 L7.345,23.312 C7.74388,23.2017 8.10642,22.9892 8.398,22.697 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!--  Edit line indicator  -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M15,5 L19,9"
+        android:strokeWidth="2"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
