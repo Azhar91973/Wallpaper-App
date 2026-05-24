@@ -5,6 +5,9 @@ import com.example.dynamicwallpaper.BuildConfig
 import com.example.dynamicwallpaper.Common.SharedPrefs
 import com.example.dynamicwallpaper.Utils.ApiRoutes.BASE_URL
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,13 +30,23 @@ object NetworkModule {
     //    Provides object of OkkHttpClient
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(loggingInterceptor).addInterceptor { chain ->
-            val request = chain.request().newBuilder().addHeader(
-                "Authorization", BuildConfig.API_KEY
-            ).build()
-            chain.proceed(request)
-        }.build()
+    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+        val chuckerInterceptor = ChuckerInterceptor.Builder(context)
+            .collector(ChuckerCollector(context))
+            .maxContentLength(250000L)
+            .redactHeaders(emptySet())
+            .alwaysReadResponseBody(false)
+            .build()
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(chuckerInterceptor)
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder().addHeader(
+                    "Authorization", BuildConfig.API_KEY
+                ).build()
+                chain.proceed(request)
+            }.build()
     }
 
     //    Provides object of Retrofit
@@ -58,9 +71,4 @@ object NetworkModule {
         return SharedPrefs(context)
     }
 
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth {
-        return FirebaseAuth.getInstance()
-    }
 }

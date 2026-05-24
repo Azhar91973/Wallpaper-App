@@ -55,25 +55,7 @@
 
 
 
-    <!-- Profile Screen Colors -->
-    <color name="blue_icon">#2563EB</color>        <!-- Blue for Notifications -->
-    <color name="purple_icon">#9333EA</color>      <!-- Purple for Privacy -->
-    <color name="orange_icon">#EA580C</color>      <!-- Orange for Password -->
-    <color name="green_icon">#059669</color>       <!-- Green for Language -->
-    <color name="indigo_icon">#4F46E5</color>      <!-- Indigo for Help -->
 
-    <!-- Icon Background Colors -->
-    <color name="blue_bg">#1A2563EB</color>        <!-- Blue background 10% -->
-    <color name="purple_bg">#1A9333EA</color>      <!-- Purple background 10% -->
-    <color name="orange_bg">#1AEA580C</color>      <!-- Orange background 10% -->
-    <color name="green_bg">#1A059669</color>       <!-- Green background 10% -->
-    <color name="indigo_bg">#1A4F46E5</color>      <!-- Indigo background 10% -->
-
-    <!-- Logout Button -->
-    <color name="red_start">#EF4444</color>        <!-- Red gradient start -->
-    <color name="red_mid">#DC2626</color>          <!-- Red gradient middle -->
-    <color name="red_end">#EF4444</color>          <!-- Red gradient end -->
-    <color name="red_shadow">#4DEF4444</color>     <!-- Red shadow 30% -->
 
 
 

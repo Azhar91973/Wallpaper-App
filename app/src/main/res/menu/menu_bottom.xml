@@ -12,7 +12,4 @@
         android:icon="@drawable/ic_heart"
         android:title="@string/favourites" />
 
-    <item
-        android:icon="@drawable/ic_setting"
-        android:title="@string/profile" />
 </menu>

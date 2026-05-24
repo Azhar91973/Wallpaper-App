@@ -45,20 +45,6 @@
     <!-- Icon Backgrounds (Dark Theme) -->
     <color name="icon_container_bg">#1A29323B</color>     <!-- 10% primary -->
 
-    <!-- Settings Icon Colors (Unchanged - work on both themes) -->
-    <color name="blue_icon">#3B82F6</color>               <!-- Brighter blue -->
-    <color name="purple_icon">#A855F7</color>             <!-- Brighter purple -->
-    <color name="orange_icon">#FB923C</color>             <!-- Brighter orange -->
-    <color name="green_icon">#10B981</color>              <!-- Brighter green -->
-    <color name="indigo_icon">#6366F1</color>             <!-- Brighter indigo -->
-
-    <!-- Settings Icon Background (Dark Theme) -->
-    <color name="blue_bg">#1A3B82F6</color>               <!-- 10% blue -->
-    <color name="purple_bg">#1AA855F7</color>             <!-- 10% purple -->
-    <color name="orange_bg">#1AFB923C</color>             <!-- 10% orange -->
-    <color name="green_bg">#1A10B981</color>              <!-- 10% green -->
-    <color name="indigo_bg">#1A6366F1</color>             <!-- 10% indigo -->
-
     <!-- Divider (Dark Theme) -->
     <color name="divider">#333333</color>                 <!-- Dark divider -->
 

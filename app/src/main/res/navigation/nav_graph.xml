@@ -31,9 +31,6 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
-        <action
-            android:id="@+id/action_HomeFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
 
     </fragment>
     <fragment
@@ -103,8 +100,4 @@
             android:id="@+id/action_categoryFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.dynamicwallpaper.Fragments.ProfileFragment"
-        android:label="ProfileFragment" />
 </navigation>

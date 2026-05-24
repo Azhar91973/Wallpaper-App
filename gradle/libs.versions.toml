@@ -1,6 +1,6 @@
 [versions]
 agp = "8.13.0"
-firebaseBom = "34.6.0"
+firebaseBom = "34.13.0"
 glide = "5.0.5"
 compiler = "5.0.5"
 gson = "2.13.2"
@@ -26,6 +26,7 @@ shimmer = "0.5.0"
 smoothbottombar = "1.7.9"
 workversion = "2.11.0"
 uiTextAndroid = "1.9.4"
+chucker = "4.3.1"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
@@ -46,6 +47,7 @@ converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -66,6 +68,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 smoothbottombar = { module = "com.github.ibrahimsn98:SmoothBottomBar", version.ref = "smoothbottombar" }
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
+chucker-library = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
+chucker-library-no-op = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

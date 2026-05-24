@@ -11,6 +11,9 @@ import com.example.dynamicwallpaper.Paging.SearchWallpapersPagingSource
 import com.example.dynamicwallpaper.Paging.WallpaperPagingSource
 import com.example.dynamicwallpaper.Utils.Constants.MAX_SIZE
 import com.example.dynamicwallpaper.Utils.Constants.PER_PAGE_ITEMS
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

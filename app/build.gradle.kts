@@ -7,6 +7,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -25,14 +26,36 @@ android {
         }
         val apiKey = prop.getProperty("api_key")
         buildConfigField("String", "API_KEY", apiKey)
+        manifestPlaceholders["appLabel"] = "Dynamic Wallpaper"
+    }
+
+    flavorDimensions += "version"
+    productFlavors {
+        create("stage") {
+            dimension = "version"
+            // applicationIdSuffix = ".stage" // Uncomment if you add this package to google-services.json
+            versionNameSuffix = "-stage"
+            manifestPlaceholders["appLabel"] = "Wallpaper Stage"
+            buildConfigField("String", "BASE_URL", "\"https://api.pexels.com/\"")
+            buildConfigField("String", "ENV", "\"STAGE\"")
+        }
+        create("prod") {
+            dimension = "version"
+            manifestPlaceholders["appLabel"] = "Dynamic Wallpaper"
+            buildConfigField("String", "BASE_URL", "\"https://api.pexels.com/\"")
+            buildConfigField("String", "ENV", "\"PROD\"")
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug") // todo change it jks is available
+
         }
     }
     buildFeatures {
@@ -83,6 +106,8 @@ dependencies {
     // OkHttp
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.no.op)
 
     // Retrofit
     implementation(libs.retrofit)
@@ -117,6 +142,7 @@ dependencies {
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
     // firebase auth
     implementation(libs.firebase.auth)
     // firestore

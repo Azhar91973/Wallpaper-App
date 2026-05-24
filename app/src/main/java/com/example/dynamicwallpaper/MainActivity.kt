@@ -142,7 +142,6 @@ class MainActivity : AppCompatActivity() {
                 0 -> navigateToDestination(R.id.HomeFragment, navOptions)
                 1 -> navigateToDestination(R.id.categoryFragment, navOptions)
                 2 -> navigateToDestination(R.id.favouriteFragment, navOptions)
-                3 -> navigateToDestination(R.id.profileFragment, navOptions)
             }
         }
     }
